@@ -2,7 +2,7 @@ name = "gmmcexam"
 compatibility_date = "2024-04-03"
 compatibility_flags = ["nodejs_compat"]
 
-[pages]
+[assets]
 directory = ".next"
 
 [vars]
