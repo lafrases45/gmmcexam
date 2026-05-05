@@ -24,12 +24,13 @@ export default function TeacherLogin() {
       });
 
       if (error) {
-        alert(error.message);
+        alert("Login Error: " + error.message);
       } else {
+        console.log("Login successful, redirecting...");
         router.push('/teacher');
       }
     } catch (err: any) {
-      alert('An unexpected error occurred');
+      alert('Unexpected Error: ' + (err.message || 'Check your internet connection'));
     } finally {
       setLoading(false);
     }
