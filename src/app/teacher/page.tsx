@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
 import { getTeacherDashboardData, getExams, getSubjects } from '@/lib/actions/exam-actions'
 import TeacherPanel from '@/components/exams/TeacherPanel'
