@@ -132,7 +132,7 @@ export default function SeatPlanPage() {
         const roomsToUse = bulkMode === 'auto' 
           ? PRESET_ROOMS 
           : PRESET_ROOMS.filter(r => selectedRoomNames.includes(r.name));
-        currentCapacity = roomsToUse.reduce((acc, r) => acc + (r.windowBenches + r.doorBenches) * 2, 0);
+        currentCapacity = roomsToUse.reduce((acc, r) => acc + (r.windows + r.doors) * 2, 0);
       }
 
       if (students.length > currentCapacity) {
