@@ -7,11 +7,6 @@ export async function getUserRole() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  // NOTE: Forcing Admin role locally so you can view the new changes without fighting Auth/RLS!
-  // In production, you would uncomment the checks below.
-  return 'Admin'
-
-  /*
   if (!user) return null
 
   const { data: roleData } = await supabase
@@ -21,7 +16,6 @@ export async function getUserRole() {
     .single()
 
   return roleData?.role || 'Teacher'
-  */
 }
 
 export async function getExams() {
@@ -353,6 +347,7 @@ export async function getLedger() {
       subjects(name, code)
     `)
     .order('created_at', { ascending: false })
+    .limit(500) // Optimization: Don't load more than 500 records at once
 
   if (error) console.error("Supabase Error (getLedger):", JSON.stringify(error))
   return data || []
@@ -724,9 +719,11 @@ export async function deleteSeatPlan(id: string) {
 export async function getTeacherDashboardData(email: string, userId: string) {
   const supabase = await createClient()
   
-  // 1. Get assigned subject IDs
-  const { data: realAssignments } = await supabase.from('teacher_subjects').select('subject_id').eq('teacher_id', userId)
-  const { data: pendingAssignments } = await supabase.from('pending_assignments').select('subject_id').eq('email', email)
+  // 1. Get assigned subject IDs in parallel
+  const [{ data: realAssignments }, { data: pendingAssignments }] = await Promise.all([
+    supabase.from('teacher_subjects').select('subject_id').eq('teacher_id', userId),
+    supabase.from('pending_assignments').select('subject_id').eq('email', email)
+  ])
   
   const subjectIds = [...new Set([
     ...(realAssignments?.map(a => a.subject_id) || []),
@@ -735,19 +732,18 @@ export async function getTeacherDashboardData(email: string, userId: string) {
 
   if (subjectIds.length === 0) return { assignments: [], exams: [], allAssignedSubjects: [] }
 
-  // 2. Get the actual subject names for transparency
-  const { data: subjectDetails } = await supabase.from('subjects').select('id, name, code').in('id', subjectIds)
-
-  // 3. Get details of these assignments across all exams
-  const { data, error } = await supabase
-    .from('exam_subjects')
-    .select(`
-      exam_id,
-      subject_id,
-      exams!inner(id, name, program, status),
-      subjects!inner(name, code)
-    `)
-    .in('subject_id', subjectIds)
+  // 2. Get details in parallel
+  const [{ data: subjectDetails }, { data, error }] = await Promise.all([
+    supabase.from('subjects').select('id, name, code').in('id', subjectIds),
+    supabase.from('exam_subjects')
+      .select(`
+        exam_id,
+        subject_id,
+        exams!inner(id, name, program, status),
+        subjects!inner(name, code)
+      `)
+      .in('subject_id', subjectIds)
+  ])
 
   if (error) {
     console.error("Dashboard Data Error:", error)
