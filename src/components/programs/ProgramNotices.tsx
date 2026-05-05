@@ -1,6 +1,5 @@
 import React from 'react';
-import { Notice } from '@/models/Notice';
-import dbConnect from '@/lib/db';
+import { createClient } from '@/lib/supabase/server';
 import styles from '../../app/programs/[slug]/program.module.css';
 
 interface ProgramNoticesProps {
@@ -11,17 +10,21 @@ const ProgramNotices = async ({ category }: ProgramNoticesProps) => {
   let notices = [];
   
   try {
-    await dbConnect();
-    notices = await Notice.find({ 
-      $or: [
-        { category: category },
-        { category: 'General' }
-      ]
-    })
-    .sort({ date: -1 })
-    .limit(5);
+    const supabase = await createClient();
+    
+    // Fetch notices for the specific program category OR general notices
+    const { data, error } = await supabase
+      .from('notices')
+      .select('*')
+      .or(`category.eq.${category},category.eq.General`)
+      .order('date', { ascending: false })
+      .limit(5);
+
+    if (error) throw error;
+    notices = data || [];
+
   } catch (error) {
-    console.error("Database connection failed in ProgramNotices:", error);
+    console.error("Supabase fetch failed in ProgramNotices:", error);
     return (
       <div className={styles.textBlock}>
         <p>Program notices are currently unavailable. Please check the main notices page.</p>
@@ -40,7 +43,7 @@ const ProgramNotices = async ({ category }: ProgramNoticesProps) => {
   return (
     <div className={styles.noticeList}>
       {notices.map((notice, index) => (
-        <div key={index} className={styles.noticeItem}>
+        <div key={notice.id} className={styles.noticeItem}>
           <div className={styles.noticeDate}>
             <span>{new Date(notice.date).getDate()}</span>
             <span>{new Date(notice.date).toLocaleString('default', { month: 'short' })}</span>
@@ -48,6 +51,11 @@ const ProgramNotices = async ({ category }: ProgramNoticesProps) => {
           <div className={styles.noticeDetails}>
             <h4>{notice.title}</h4>
             <p>{notice.description.substring(0, 100)}...</p>
+            {notice.file_url && (
+              <a href={notice.file_url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline mt-1 block">
+                View Attachment
+              </a>
+            )}
           </div>
         </div>
       ))}

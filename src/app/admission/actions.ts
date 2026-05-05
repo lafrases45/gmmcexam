@@ -1,29 +1,30 @@
 'use server';
 
-import connectToDatabase from '@/lib/db';
-import { Admission } from '@/models/Admission';
+import { createClient } from '@/lib/supabase/server';
 
 export async function submitAdmissionForm(formData: FormData) {
   try {
-    await connectToDatabase();
+    const supabase = await createClient();
     
     const data = {
-      fullName: formData.get('fullName'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      dob: formData.get('dob'),
-      program: formData.get('program'),
-      previousEducation: formData.get('previousEducation'),
+      full_name: formData.get('fullName') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      dob: formData.get('dob') as string,
+      program: formData.get('program') as string,
+      previous_education: formData.get('previousEducation') as string,
+      status: 'Pending'
     };
     
-    const newAdmission = new Admission(data);
-    await newAdmission.save();
+    const { error } = await supabase
+      .from('online_admissions')
+      .insert([data]);
+
+    if (error) throw error;
     
     return { success: true, message: 'Your application has been received successfully!' };
   } catch (error: any) {
-    if (error.message && error.message.includes('MONGODB_URI')) {
-      return { success: false, message: 'Database string not configured yet. Set MONGODB_URI in your environment.' };
-    }
+    console.error('Admission Submission Error:', error);
     return { success: false, message: 'Failed to submit application. Please verify your details.' };
   }
 }
