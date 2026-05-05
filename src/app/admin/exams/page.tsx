@@ -3,6 +3,7 @@ import styles from './exams.module.css'
 import AdminPanel from '@/components/exams/AdminPanel'
 import TeacherPanel from '@/components/exams/TeacherPanel'
 import { getUserRole, getExams, getSubjects, getLedger } from '@/lib/actions/exam-actions'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
