@@ -1,0 +1,1421 @@
+{
+  "sessionId": "a24234de-fdc8-4a73-964e-2ef7fd27698d",
+  "metadata": {
+    "examYear": "2026",
+    "program": "BBS",
+    "part": "First",
+    "enrollmentYear": "2025",
+    "resultPublishedDate": "2082/12/05",
+    "examDate": "2082/12/06"
+  },
+  "subjects": [
+    {
+      "code": "MGT.205",
+      "name": "Business Communication"
+    },
+    {
+      "code": "MGT.212",
+      "name": "Cost & Mgmt. Accounting"
+    },
+    {
+      "code": "MGT.215",
+      "name": "Fundamentals of Financial Mgmt."
+    },
+    {
+      "code": "MGT.209",
+      "name": "Macroeconomics for Business"
+    },
+    {
+      "code": "MGT.223",
+      "name": "Organizational Behavior & HRM."
+    }
+  ],
+  "students": [
+    {
+      "sn": 1,
+      "name": "AASHIKA  B. K",
+      "rollNo": "707810002",
+      "tuRegd": "7-2-781-25-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 53,
+        "MGT.212": 50,
+        "MGT.215": 66,
+        "MGT.209": 63,
+        "MGT.223": 41
+      },
+      "total": 273,
+      "percent": 54.6,
+      "result": "Passed"
+    },
+    {
+      "sn": 2,
+      "name": "AAYUSHA  BARAL",
+      "rollNo": "707810003",
+      "tuRegd": "7-2-781-26-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 62,
+        "MGT.212": 66,
+        "MGT.215": 71,
+        "MGT.209": 66,
+        "MGT.223": 39
+      },
+      "total": 304,
+      "percent": 60.8,
+      "result": "Passed"
+    },
+    {
+      "sn": 3,
+      "name": "ABISHEK  BARAL",
+      "rollNo": "707810004",
+      "tuRegd": "7-2-781-28-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 35,
+        "MGT.212": 35,
+        "MGT.215": 29,
+        "MGT.209": 40,
+        "MGT.223": 27
+      },
+      "total": 166,
+      "percent": 33.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 4,
+      "name": "AKRITI  SUBEDI",
+      "rollNo": "707810005",
+      "tuRegd": "7-2-781-29-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 42,
+        "MGT.212": 47,
+        "MGT.215": 66,
+        "MGT.209": 64,
+        "MGT.223": 28
+      },
+      "total": 247,
+      "percent": 49.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 5,
+      "name": "ALINA  POKHREL",
+      "rollNo": "707810006",
+      "tuRegd": "7-2-781-31-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 54,
+        "MGT.212": 64,
+        "MGT.215": 46,
+        "MGT.209": 62,
+        "MGT.223": 39
+      },
+      "total": 265,
+      "percent": 53,
+      "result": "Passed"
+    },
+    {
+      "sn": 6,
+      "name": "ALISHA  KHATRI",
+      "rollNo": "707810007",
+      "tuRegd": "7-2-781-32-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 45,
+        "MGT.212": 28,
+        "MGT.215": 35,
+        "MGT.209": 62,
+        "MGT.223": 35
+      },
+      "total": 205,
+      "percent": 41,
+      "result": "Failed"
+    },
+    {
+      "sn": 7,
+      "name": "AMRIT  BARAL",
+      "rollNo": "707810008",
+      "tuRegd": "7-2-781-34-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 1,
+        "MGT.212": 22,
+        "MGT.215": 48,
+        "MGT.209": 40,
+        "MGT.223": 4
+      },
+      "total": 115,
+      "percent": 23,
+      "result": "Failed"
+    },
+    {
+      "sn": 8,
+      "name": "ANISHA  B. K.",
+      "rollNo": "707810009",
+      "tuRegd": "7-2-781-36-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 35,
+        "MGT.212": 26,
+        "MGT.215": 47,
+        "MGT.209": 58,
+        "MGT.223": 15
+      },
+      "total": 181,
+      "percent": 36.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 9,
+      "name": "ANISHA  PARIYAR",
+      "rollNo": "707810010",
+      "tuRegd": "7-2-781-37-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 43,
+        "MGT.212": 20,
+        "MGT.215": 38,
+        "MGT.209": 68,
+        "MGT.223": 21
+      },
+      "total": 190,
+      "percent": 38,
+      "result": "Failed"
+    },
+    {
+      "sn": 10,
+      "name": "ANJALI  PAUDEL",
+      "rollNo": "707810011",
+      "tuRegd": "7-2-781-39-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 62,
+        "MGT.212": 68,
+        "MGT.215": 81,
+        "MGT.209": 71,
+        "MGT.223": 40
+      },
+      "total": 322,
+      "percent": 64.4,
+      "result": "Passed"
+    },
+    {
+      "sn": 11,
+      "name": "ANU  K. C.",
+      "rollNo": "707810012",
+      "tuRegd": "7-2-781-40-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 45,
+        "MGT.212": 39,
+        "MGT.215": 26,
+        "MGT.209": 65,
+        "MGT.223": 35
+      },
+      "total": 210,
+      "percent": 42,
+      "result": "Failed"
+    },
+    {
+      "sn": 12,
+      "name": "ANUSKA  GURUNG",
+      "rollNo": "707810013",
+      "tuRegd": "7-2-781-42-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 38,
+        "MGT.212": 35,
+        "MGT.215": 18,
+        "MGT.209": 39,
+        "MGT.223": 23
+      },
+      "total": 153,
+      "percent": 30.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 13,
+      "name": "ARCHANA  BARAL",
+      "rollNo": "707810014",
+      "tuRegd": "7-2-781-43-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 44,
+        "MGT.212": 5,
+        "MGT.215": "AB",
+        "MGT.209": 18,
+        "MGT.223": "AB"
+      },
+      "total": 67,
+      "percent": 13.4,
+      "result": "Fail & Partly Absent"
+    },
+    {
+      "sn": 14,
+      "name": "BABITA  SUNAR",
+      "rollNo": "707810015",
+      "tuRegd": "7-2-781-68-2021",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 43,
+        "MGT.212": 4,
+        "MGT.215": "AB",
+        "MGT.209": 11,
+        "MGT.223": 17
+      },
+      "total": 75,
+      "percent": 15,
+      "result": "Fail & Partly Absent"
+    },
+    {
+      "sn": 15,
+      "name": "BIBEK  LAMSAL",
+      "rollNo": "707810016",
+      "tuRegd": "7-2-781-50-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 27,
+        "MGT.212": 20,
+        "MGT.215": 40,
+        "MGT.209": 35,
+        "MGT.223": 15
+      },
+      "total": 137,
+      "percent": 27.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 16,
+      "name": "BINISHA  GURUNG",
+      "rollNo": "707810017",
+      "tuRegd": "7-2-781-54-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 22,
+        "MGT.212": 12,
+        "MGT.215": 35,
+        "MGT.209": 35,
+        "MGT.223": 16
+      },
+      "total": 120,
+      "percent": 24,
+      "result": "Failed"
+    },
+    {
+      "sn": 17,
+      "name": "BINITA  PAUDEL",
+      "rollNo": "707810018",
+      "tuRegd": "7-2-781-55-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 37,
+        "MGT.212": 7,
+        "MGT.215": 35,
+        "MGT.209": 51,
+        "MGT.223": 16
+      },
+      "total": 146,
+      "percent": 29.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 18,
+      "name": "BINITA  RANABHAT",
+      "rollNo": "707810019",
+      "tuRegd": "7-2-781-56-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 46,
+        "MGT.212": 35,
+        "MGT.215": 35,
+        "MGT.209": 17,
+        "MGT.223": 23
+      },
+      "total": 156,
+      "percent": 31.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 19,
+      "name": "BISMITA  THAPA",
+      "rollNo": "707810020",
+      "tuRegd": "7-2-781-61-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 39,
+        "MGT.212": 13,
+        "MGT.215": 35,
+        "MGT.209": 36,
+        "MGT.223": 35
+      },
+      "total": 158,
+      "percent": 31.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 20,
+      "name": "DARSHAN  SHRESTHA",
+      "rollNo": "707810021",
+      "tuRegd": "7-2-781-64-2023",
+      "ethnic": "Janajati",
+      "gender": "",
+      "marks": {
+        "MGT.205": 39,
+        "MGT.212": 35,
+        "MGT.215": 35,
+        "MGT.209": 51,
+        "MGT.223": 35
+      },
+      "total": 195,
+      "percent": 39,
+      "result": "Passed"
+    },
+    {
+      "sn": 21,
+      "name": "DEBAKI  CHHETRI",
+      "rollNo": "707810022",
+      "tuRegd": "7-2-781-65-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 49,
+        "MGT.212": 14,
+        "MGT.215": 36,
+        "MGT.209": 44,
+        "MGT.223": 39
+      },
+      "total": 182,
+      "percent": 36.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 22,
+      "name": "DIPIKA  THAPA",
+      "rollNo": "707810023",
+      "tuRegd": "7-2-781-71-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 49,
+        "MGT.212": 35,
+        "MGT.215": 35,
+        "MGT.209": 46,
+        "MGT.223": 35
+      },
+      "total": 200,
+      "percent": 40,
+      "result": "Passed"
+    },
+    {
+      "sn": 23,
+      "name": "GARIMA  SUBEDI",
+      "rollNo": "707810024",
+      "tuRegd": "7-2-781-73-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 56,
+        "MGT.212": 42,
+        "MGT.215": 38,
+        "MGT.209": 63,
+        "MGT.223": 35
+      },
+      "total": 234,
+      "percent": 46.8,
+      "result": "Passed"
+    },
+    {
+      "sn": 24,
+      "name": "JOSHANA  TIMILSINA",
+      "rollNo": "707810026",
+      "tuRegd": "7-2-781-80-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 42,
+        "MGT.212": 8,
+        "MGT.215": 17,
+        "MGT.209": 43,
+        "MGT.223": 35
+      },
+      "total": 145,
+      "percent": 29,
+      "result": "Failed"
+    },
+    {
+      "sn": 25,
+      "name": "KABIRAJ  BARAL",
+      "rollNo": "707810027",
+      "tuRegd": "7-2-781-81-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 58,
+        "MGT.212": 44,
+        "MGT.215": 46,
+        "MGT.209": 54,
+        "MGT.223": 38
+      },
+      "total": 240,
+      "percent": 48,
+      "result": "Passed"
+    },
+    {
+      "sn": 26,
+      "name": "KABITA  ADHIKARI",
+      "rollNo": "707810028",
+      "tuRegd": "7-2-781-82-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 40,
+        "MGT.212": 19,
+        "MGT.215": 27,
+        "MGT.209": 45,
+        "MGT.223": 27
+      },
+      "total": 158,
+      "percent": 31.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 27,
+      "name": "KAMALA  SARKI",
+      "rollNo": "707810029",
+      "tuRegd": "7-2-781-83-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 52,
+        "MGT.212": 20,
+        "MGT.215": 26,
+        "MGT.209": 41,
+        "MGT.223": 22
+      },
+      "total": 161,
+      "percent": 32.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 28,
+      "name": "KARINA KUMARI CHHETRI",
+      "rollNo": "707810030",
+      "tuRegd": "7-2-781-86-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 37,
+        "MGT.212": 15,
+        "MGT.215": 17,
+        "MGT.209": 16,
+        "MGT.223": 28
+      },
+      "total": 113,
+      "percent": 22.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 29,
+      "name": "KRISTINA  GHALE",
+      "rollNo": "707810031",
+      "tuRegd": "7-2-781-88-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 17,
+        "MGT.212": 3,
+        "MGT.215": 7,
+        "MGT.209": 1,
+        "MGT.223": 4
+      },
+      "total": 32,
+      "percent": 6.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 30,
+      "name": "KRITI  KARKI",
+      "rollNo": "707810032",
+      "tuRegd": "7-2-781-91-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 63,
+        "MGT.212": 55,
+        "MGT.215": 56,
+        "MGT.209": 60,
+        "MGT.223": 43
+      },
+      "total": 277,
+      "percent": 55.4,
+      "result": "Passed"
+    },
+    {
+      "sn": 31,
+      "name": "MANISHA  REGMI",
+      "rollNo": "707810033",
+      "tuRegd": "7-2-781-96-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 21,
+        "MGT.212": 22,
+        "MGT.215": 29,
+        "MGT.209": 9,
+        "MGT.223": 22
+      },
+      "total": 103,
+      "percent": 20.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 32,
+      "name": "MENUKA  KUNWAR",
+      "rollNo": "707810034",
+      "tuRegd": "7-2-781-97-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 24,
+        "MGT.212": 12,
+        "MGT.215": 28,
+        "MGT.209": 37,
+        "MGT.223": 20
+      },
+      "total": 121,
+      "percent": 24.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 33,
+      "name": "MUNA  KARKI",
+      "rollNo": "707810035",
+      "tuRegd": "7-2-781-100-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 17,
+        "MGT.212": 5,
+        "MGT.215": 22,
+        "MGT.209": 6,
+        "MGT.223": 5
+      },
+      "total": 55,
+      "percent": 11,
+      "result": "Failed"
+    },
+    {
+      "sn": 34,
+      "name": "MUNA LISHA CHHETRI",
+      "rollNo": "707810036",
+      "tuRegd": "7-2-781-101-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 10,
+        "MGT.212": 4,
+        "MGT.215": 22,
+        "MGT.209": 35,
+        "MGT.223": 21
+      },
+      "total": 92,
+      "percent": 18.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 35,
+      "name": "NAMITA  ACHARYA",
+      "rollNo": "707810037",
+      "tuRegd": "7-2-781-103-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 55,
+        "MGT.212": 15,
+        "MGT.215": 57,
+        "MGT.209": 50,
+        "MGT.223": 25
+      },
+      "total": 202,
+      "percent": 40.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 36,
+      "name": "NISHA  SAPKOTA",
+      "rollNo": "707810038",
+      "tuRegd": "7-2-781-109-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 54,
+        "MGT.212": 35,
+        "MGT.215": 49,
+        "MGT.209": 59,
+        "MGT.223": 28
+      },
+      "total": 225,
+      "percent": 45,
+      "result": "Failed"
+    },
+    {
+      "sn": 37,
+      "name": "NISHANI  BHUJEL",
+      "rollNo": "707810039",
+      "tuRegd": "7-2-781-111-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 19,
+        "MGT.212": 6,
+        "MGT.215": 35,
+        "MGT.209": 15,
+        "MGT.223": 11
+      },
+      "total": 86,
+      "percent": 17.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 38,
+      "name": "OJASBE  BARAL",
+      "rollNo": "707810040",
+      "tuRegd": "7-2-781-112-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 58,
+        "MGT.212": 10,
+        "MGT.215": 43,
+        "MGT.209": 46,
+        "MGT.223": 16
+      },
+      "total": 173,
+      "percent": 34.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 39,
+      "name": "PASANG DOLMA GURUNG",
+      "rollNo": "707810041",
+      "tuRegd": "7-2-781-114-2023",
+      "ethnic": "Janajati",
+      "gender": "",
+      "marks": {
+        "MGT.205": 47,
+        "MGT.212": 15,
+        "MGT.215": 26,
+        "MGT.209": 15,
+        "MGT.223": 10
+      },
+      "total": 113,
+      "percent": 22.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 40,
+      "name": "PRAKRITI  POUDEL",
+      "rollNo": "707810042",
+      "tuRegd": "7-2-781-200-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 67,
+        "MGT.212": 76,
+        "MGT.215": 75,
+        "MGT.209": 63,
+        "MGT.223": 41
+      },
+      "total": 322,
+      "percent": 64.4,
+      "result": "Passed"
+    },
+    {
+      "sn": 41,
+      "name": "PRAMILA  POUDEL",
+      "rollNo": "707810043",
+      "tuRegd": "7-2-781-116-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 45,
+        "MGT.212": 57,
+        "MGT.215": 63,
+        "MGT.209": 44,
+        "MGT.223": 25
+      },
+      "total": 234,
+      "percent": 46.8,
+      "result": "Failed"
+    },
+    {
+      "sn": 42,
+      "name": "PRAMIN  BHANDARI",
+      "rollNo": "707810044",
+      "tuRegd": "7-2-781-117-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 9,
+        "MGT.212": 1,
+        "MGT.215": 1,
+        "MGT.209": 35,
+        "MGT.223": 6
+      },
+      "total": 52,
+      "percent": 10.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 43,
+      "name": "PRAMISHA  SUBEDI",
+      "rollNo": "707810045",
+      "tuRegd": "7-2-781-118-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 12,
+        "MGT.212": "AB",
+        "MGT.215": "AB",
+        "MGT.209": 3,
+        "MGT.223": "AB"
+      },
+      "total": 15,
+      "percent": 3,
+      "result": "Fail & Partly Absent"
+    },
+    {
+      "sn": 44,
+      "name": "PRASUNA  BARAL",
+      "rollNo": "707810046",
+      "tuRegd": "7-2-781-123-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 59,
+        "MGT.212": 23,
+        "MGT.215": 44,
+        "MGT.209": 55,
+        "MGT.223": 18
+      },
+      "total": 199,
+      "percent": 39.8,
+      "result": "Failed"
+    },
+    {
+      "sn": 45,
+      "name": "PRATIKA  GURUNG",
+      "rollNo": "707810047",
+      "tuRegd": "7-2-781-124-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 27,
+        "MGT.212": 7,
+        "MGT.215": 5,
+        "MGT.209": 14,
+        "MGT.223": 16
+      },
+      "total": 69,
+      "percent": 13.8,
+      "result": "Failed"
+    },
+    {
+      "sn": 46,
+      "name": "PRATIVA  POKHREL",
+      "rollNo": "707810048",
+      "tuRegd": "7-2-781-125-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 51,
+        "MGT.212": 62,
+        "MGT.215": 56,
+        "MGT.209": 50,
+        "MGT.223": 43
+      },
+      "total": 262,
+      "percent": 52.4,
+      "result": "Passed"
+    },
+    {
+      "sn": 47,
+      "name": "PUSKAR  NEUPANE",
+      "rollNo": "707810049",
+      "tuRegd": "7-2-781-127-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 51,
+        "MGT.212": 22,
+        "MGT.215": 49,
+        "MGT.209": 25,
+        "MGT.223": 41
+      },
+      "total": 188,
+      "percent": 37.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 48,
+      "name": "RACHANA  SUNAR",
+      "rollNo": "707810050",
+      "tuRegd": "7-2-781-129-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 52,
+        "MGT.212": 20,
+        "MGT.215": 38,
+        "MGT.209": 38,
+        "MGT.223": 45
+      },
+      "total": 193,
+      "percent": 38.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 49,
+      "name": "RAKSHYA  BHUJEL",
+      "rollNo": "707810051",
+      "tuRegd": "7-2-781-132-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 35,
+        "MGT.212": 6,
+        "MGT.215": 29,
+        "MGT.209": 37,
+        "MGT.223": 27
+      },
+      "total": 134,
+      "percent": 26.8,
+      "result": "Failed"
+    },
+    {
+      "sn": 50,
+      "name": "RASMI   BASTOLA",
+      "rollNo": "707810052",
+      "tuRegd": "7-2-781-136-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 53,
+        "MGT.212": 35,
+        "MGT.215": 44,
+        "MGT.209": 40,
+        "MGT.223": 47
+      },
+      "total": 219,
+      "percent": 43.8,
+      "result": "Passed"
+    },
+    {
+      "sn": 51,
+      "name": "RITIKA   PAUDEL",
+      "rollNo": "707810053",
+      "tuRegd": "7-2-781-139-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 59,
+        "MGT.212": 56,
+        "MGT.215": 37,
+        "MGT.209": 64,
+        "MGT.223": 43
+      },
+      "total": 259,
+      "percent": 51.8,
+      "result": "Passed"
+    },
+    {
+      "sn": 52,
+      "name": "ROSHAN  SUBEDI",
+      "rollNo": "707810054",
+      "tuRegd": "7-2-781-142-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 49,
+        "MGT.212": 24,
+        "MGT.215": 47,
+        "MGT.209": 39,
+        "MGT.223": 36
+      },
+      "total": 195,
+      "percent": 39,
+      "result": "Failed"
+    },
+    {
+      "sn": 53,
+      "name": "SACHITA   ADHIKARI",
+      "rollNo": "707810055",
+      "tuRegd": "7-2-781-145-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 53,
+        "MGT.212": 9,
+        "MGT.215": 41,
+        "MGT.209": 23,
+        "MGT.223": 22
+      },
+      "total": 148,
+      "percent": 29.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 54,
+      "name": "SAKRIM BAHADUR REGMI",
+      "rollNo": "707810056",
+      "tuRegd": "7-2-781-150-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 38,
+        "MGT.212": 2,
+        "MGT.215": 9,
+        "MGT.209": 45,
+        "MGT.223": 1
+      },
+      "total": 95,
+      "percent": 19,
+      "result": "Failed"
+    },
+    {
+      "sn": 55,
+      "name": "SALINA  BASTAKOTI",
+      "rollNo": "707810057",
+      "tuRegd": "7-2-781-151-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 64,
+        "MGT.212": 35,
+        "MGT.215": 48,
+        "MGT.209": 70,
+        "MGT.223": 54
+      },
+      "total": 271,
+      "percent": 54.2,
+      "result": "Passed"
+    },
+    {
+      "sn": 56,
+      "name": "SALINA  THAPA MAGAR",
+      "rollNo": "707810058",
+      "tuRegd": "7-2-781-152-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 36,
+        "MGT.212": 3,
+        "MGT.215": 4,
+        "MGT.209": 20,
+        "MGT.223": 20
+      },
+      "total": 83,
+      "percent": 16.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 57,
+      "name": "SANDESH  PAUDEL",
+      "rollNo": "707810059",
+      "tuRegd": "7-2-781-154-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 35,
+        "MGT.212": 3,
+        "MGT.215": 7,
+        "MGT.209": 22,
+        "MGT.223": 23
+      },
+      "total": 90,
+      "percent": 18,
+      "result": "Failed"
+    },
+    {
+      "sn": 58,
+      "name": "SAPANA  KARKI",
+      "rollNo": "707810060",
+      "tuRegd": "7-2-781-156-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 59,
+        "MGT.212": 35,
+        "MGT.215": 56,
+        "MGT.209": 79,
+        "MGT.223": 69
+      },
+      "total": 298,
+      "percent": 59.6,
+      "result": "Passed"
+    },
+    {
+      "sn": 59,
+      "name": "SARASWOTI  BARAL",
+      "rollNo": "707810061",
+      "tuRegd": "7-2-781-157-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 44,
+        "MGT.212": 66,
+        "MGT.215": 53,
+        "MGT.209": 62,
+        "MGT.223": 47
+      },
+      "total": 272,
+      "percent": 54.4,
+      "result": "Passed"
+    },
+    {
+      "sn": 60,
+      "name": "SAROJ  PAUDEL",
+      "rollNo": "707810062",
+      "tuRegd": "7-2-781-160-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 13,
+        "MGT.212": 15,
+        "MGT.215": 22,
+        "MGT.209": 36,
+        "MGT.223": 27
+      },
+      "total": 113,
+      "percent": 22.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 61,
+      "name": "SHARMILA  KHATRI",
+      "rollNo": "707810063",
+      "tuRegd": "7-2-781-161-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 6,
+        "MGT.212": 2,
+        "MGT.215": 5,
+        "MGT.209": 35,
+        "MGT.223": 13
+      },
+      "total": 61,
+      "percent": 12.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 62,
+      "name": "SHRISTI  DHUNGANA",
+      "rollNo": "707810064",
+      "tuRegd": "7-2-781-165-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 55,
+        "MGT.212": 17,
+        "MGT.215": 27,
+        "MGT.209": 54,
+        "MGT.223": 52
+      },
+      "total": 205,
+      "percent": 41,
+      "result": "Failed"
+    },
+    {
+      "sn": 63,
+      "name": "SHRISTI  GURUNG",
+      "rollNo": "707810065",
+      "tuRegd": "7-2-781-166-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 47,
+        "MGT.212": 27,
+        "MGT.215": 63,
+        "MGT.209": 62,
+        "MGT.223": 62
+      },
+      "total": 261,
+      "percent": 52.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 64,
+      "name": "SHRISTY  KAWAR",
+      "rollNo": "707810066",
+      "tuRegd": "7-2-781-167-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 46,
+        "MGT.212": 13,
+        "MGT.215": 19,
+        "MGT.209": 44,
+        "MGT.223": 35
+      },
+      "total": 157,
+      "percent": 31.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 65,
+      "name": "SITA  B. K.",
+      "rollNo": "707810067",
+      "tuRegd": "7-2-781-170-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 62,
+        "MGT.212": 13,
+        "MGT.215": 29,
+        "MGT.209": 51,
+        "MGT.223": 52
+      },
+      "total": 207,
+      "percent": 41.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 66,
+      "name": "SITA   GURUNG",
+      "rollNo": "707810068",
+      "tuRegd": "7-2-781-171-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 35,
+        "MGT.212": 8,
+        "MGT.215": 21,
+        "MGT.209": 48,
+        "MGT.223": 36
+      },
+      "total": 148,
+      "percent": 29.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 67,
+      "name": "SNEHA  NEUPANE",
+      "rollNo": "707810069",
+      "tuRegd": "7-2-781-172-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 37,
+        "MGT.212": 19,
+        "MGT.215": 11,
+        "MGT.209": 44,
+        "MGT.223": 23
+      },
+      "total": 134,
+      "percent": 26.8,
+      "result": "Failed"
+    },
+    {
+      "sn": 68,
+      "name": "SONY BUDIJA THAPA MAGAR",
+      "rollNo": "707810070",
+      "tuRegd": "7-2-781-174-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 61,
+        "MGT.212": 48,
+        "MGT.215": 54,
+        "MGT.209": 60,
+        "MGT.223": 50
+      },
+      "total": 273,
+      "percent": 54.6,
+      "result": "Passed"
+    },
+    {
+      "sn": 69,
+      "name": "SRISTI  PAUDEL",
+      "rollNo": "707810071",
+      "tuRegd": "7-2-781-176-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 54,
+        "MGT.212": 57,
+        "MGT.215": 59,
+        "MGT.209": 66,
+        "MGT.223": 59
+      },
+      "total": 295,
+      "percent": 59,
+      "result": "Passed"
+    },
+    {
+      "sn": 70,
+      "name": "SRISTI   SIGDEL",
+      "rollNo": "707810072",
+      "tuRegd": "7-2-781-177-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 61,
+        "MGT.212": 27,
+        "MGT.215": 47,
+        "MGT.209": 66,
+        "MGT.223": 62
+      },
+      "total": 263,
+      "percent": 52.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 71,
+      "name": "SUJITA   CHHETRI",
+      "rollNo": "707810074",
+      "tuRegd": "7-2-781-185-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 44,
+        "MGT.212": 37,
+        "MGT.215": 53,
+        "MGT.209": 53,
+        "MGT.223": 67
+      },
+      "total": 254,
+      "percent": 50.8,
+      "result": "Passed"
+    },
+    {
+      "sn": 72,
+      "name": "SUMITRA   SUBEDI",
+      "rollNo": "707810075",
+      "tuRegd": "7-2-781-187-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 42,
+        "MGT.212": 19,
+        "MGT.215": 8,
+        "MGT.209": 35,
+        "MGT.223": 52
+      },
+      "total": 156,
+      "percent": 31.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 73,
+      "name": "SUSHMA  SUBEDI",
+      "rollNo": "707810076",
+      "tuRegd": "7-2-781-189-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 45,
+        "MGT.212": 19,
+        "MGT.215": 12,
+        "MGT.209": 38,
+        "MGT.223": 46
+      },
+      "total": 160,
+      "percent": 32,
+      "result": "Failed"
+    },
+    {
+      "sn": 74,
+      "name": "SWOSTIKA  UPADHAYA",
+      "rollNo": "707810077",
+      "tuRegd": "7-2-781-193-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 13,
+        "MGT.212": 2,
+        "MGT.215": 1,
+        "MGT.209": 1,
+        "MGT.223": 2
+      },
+      "total": 19,
+      "percent": 3.8,
+      "result": "Failed"
+    },
+    {
+      "sn": 75,
+      "name": "UNIKA  GURUNG",
+      "rollNo": "707810078",
+      "tuRegd": "7-2-781-197-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 18,
+        "MGT.212": 6,
+        "MGT.215": 8,
+        "MGT.209": 3,
+        "MGT.223": 5
+      },
+      "total": 40,
+      "percent": 8,
+      "result": "Failed"
+    },
+    {
+      "sn": 76,
+      "name": "YUBARAJ  SHARMA",
+      "rollNo": "707810079",
+      "tuRegd": "7-2-781-199-2023",
+      "ethnic": "Others",
+      "gender": "",
+      "marks": {
+        "MGT.205": 41,
+        "MGT.212": 23,
+        "MGT.215": 29,
+        "MGT.209": 21,
+        "MGT.223": 41
+      },
+      "total": 155,
+      "percent": 31,
+      "result": "Failed"
+    },
+    {
+      "sn": 77,
+      "name": "ASTHA  CHALISE",
+      "rollNo": "707810080",
+      "tuRegd": "7-2-781-47-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "MGT.205": 39,
+        "MGT.212": 3,
+        "MGT.215": 8,
+        "MGT.209": 39,
+        "MGT.223": 40
+      },
+      "total": 129,
+      "percent": 25.8,
+      "result": "Failed"
+    }
+  ]
+}

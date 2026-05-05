@@ -1,0 +1,207 @@
+.container {
+  min-height: 100vh;
+  background-color: white; /* Clean white for the "whole page" look */
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  position: relative;
+  height: 40vh;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 50, 146, 0.95) 0%, rgba(0, 50, 146, 0.7) 100%);
+  z-index: 1;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 1000px;
+  padding: 0 2rem;
+}
+
+.title {
+  font-size: clamp(3rem, 7vw, 4.5rem);
+  font-weight: 800;
+  font-family: var(--font-outfit);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Integrated Layout Sections */
+.mainLayout {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 6rem 1.5rem;
+}
+
+.contactPanel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  align-items: center;
+  margin-bottom: 8rem;
+}
+
+@media (max-width: 1000px) {
+  .contactPanel {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    text-align: center;
+  }
+}
+
+.infoSection h2 {
+  font-size: 2.5rem;
+  font-family: var(--font-outfit);
+  font-weight: 800;
+  color: #003292;
+  margin-bottom: 2rem;
+}
+
+.contactDetail {
+  margin-bottom: 3rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 800;
+  color: #00a8e8;
+  margin-bottom: 0.75rem;
+}
+
+.value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2d3748;
+  line-height: 1.4;
+  text-decoration: none;
+  display: block;
+}
+
+.value:hover {
+  color: #003292;
+}
+
+/* Image Guide Section */
+.imageSection {
+  position: relative;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 50, 146, 0.1);
+  border: 1px solid #edf2f7;
+}
+
+.arrivalImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.imageSection:hover .arrivalImage {
+  transform: scale(1.03);
+}
+
+.imageBadge {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  background: #00a8e8;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 10px 20px rgba(0, 168, 232, 0.3);
+}
+
+/* Full Map Integration */
+.mapHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.mapHeader h3 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #003292;
+  font-family: var(--font-outfit);
+}
+
+.fullMapWrapper {
+  width: 100%;
+  height: 600px;
+  background: #f0f4f8;
+  margin-top: 2rem;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .fullMapWrapper { height: 400px; }
+  .value { font-size: 1.4rem; }
+}
+
+/* Bottom Social Rail */
+.socialRail {
+  border-top: 1px solid #edf2f7;
+  padding: 4rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.socialIconLink {
+  color: #a0aec0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.socialIconLink:hover {
+  color: #003292;
+  transform: translateY(-3px);
+}
+
+.socialIconLink::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #00a8e8;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.socialIconLink:hover::before {
+  opacity: 1;
+}

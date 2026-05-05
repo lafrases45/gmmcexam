@@ -1,0 +1,1290 @@
+[
+  {
+    "sr": "1",
+    "name": "Business English",
+    "code": "MGT 201",
+    "program": "BBS",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "2",
+    "name": "Business Statistics",
+    "code": "MGT 202",
+    "program": "BBS",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "3",
+    "name": "Microeconomics for Business",
+    "code": "MGT 207",
+    "program": "BBS",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "4",
+    "name": "Financial Accounting and Analysis",
+    "code": "MGT 211",
+    "program": "BBS",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "5",
+    "name": "Principles of Management",
+    "code": "MGT 213",
+    "program": "BBS",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "6",
+    "name": "Business Communication",
+    "code": "MGT 205",
+    "program": "BBS",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "7",
+    "name": "Macroeconomics for Business",
+    "code": "MGT 209",
+    "program": "BBS",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "8",
+    "name": "Cost and Management Accounting",
+    "code": "MGT 212",
+    "program": "BBS",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "9",
+    "name": "Fundamentals of Marketing",
+    "code": "MGT 214",
+    "program": "BBS",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "10",
+    "name": "Business Law",
+    "code": "MGT 204",
+    "program": "BBS",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "11",
+    "name": "Fundamentals of Financial Management",
+    "code": "MGT 215",
+    "program": "BBS",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "12",
+    "name": "Taxation in Nepal",
+    "code": "MGT 224",
+    "program": "BBS",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "13",
+    "name": "Organizational Bahaviour & Human Resource Management",
+    "code": "MGT 223",
+    "program": "BBS",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "14",
+    "name": "Fundamentals of Corporate Finance",
+    "code": "FIN 250",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "15",
+    "name": "Fundamentals of Investment",
+    "code": "FIN 253",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "16",
+    "name": "Business Research Methods",
+    "code": "MGT 221",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "17",
+    "name": "Final Project",
+    "code": "MGT 401",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "18",
+    "name": "Foundation of Financial Systems",
+    "code": "MGT 226",
+    "program": "BBS",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "19",
+    "name": "Entrepreneurship",
+    "code": "MGT 225",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "20",
+    "name": "Management of Financial Institutions",
+    "code": "FIN 255",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "21",
+    "name": "General English",
+    "code": "Eng.Ed.411",
+    "program": "in Education",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "22",
+    "name": "Compulsory Nepali",
+    "code": "Nep. 401",
+    "program": "B.Ed",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "23",
+    "name": "Philosophical and Sociological Foundations of Education",
+    "code": "Ed.412",
+    "program": "in Education",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "24",
+    "name": "Foundation of Language and Linguistics",
+    "code": "Eng.Ed.416",
+    "program": "in Education",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "26",
+    "name": "Reading Writing and Critical Thinking",
+    "code": "Eng. Ed. 417",
+    "program": "417 Bachelor's in Education",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "27",
+    "name": "Nepali Katha Ra Upanyas",
+    "code": "Nep.Ed.416",
+    "program": "in Education",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "28",
+    "name": "Nepali Natak Ekanki Ra Nibandha",
+    "code": "Nep.Ed.417",
+    "program": "in Education",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "29",
+    "name": "Educational Psychology",
+    "code": "Ed.421",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "30",
+    "name": "Expanding Horizons in English",
+    "code": "Eng.Ed.422",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "31",
+    "name": "English for Communication",
+    "code": "Eng.Ed.423",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "33",
+    "name": "Basics of Academic Writing",
+    "code": "Eng.Ed.424",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "34",
+    "name": "Bhasa Bigyan ra Nepali Bhasa",
+    "code": "Nep.Ed.422",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "35",
+    "name": "Nepali Kabita Kabya",
+    "code": "Nep.Ed.423",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "36",
+    "name": "Nepali Bhasa Pathya., Pathyapustak tatha Sikshen Paddati",
+    "code": "Nep.Ed.424",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "37",
+    "name": "Curriculum and Evaluation",
+    "code": "Ed.431",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "38",
+    "name": "English Language Teaching Methods and Practices",
+    "code": "Eng.Ed.432",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "39",
+    "name": "Critical Reading in English",
+    "code": "Eng.Ed.433",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "40",
+    "name": "English for Mass Communication",
+    "code": "Eng.Ed.434",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "42",
+    "name": "Nepali Bhasa Sikshen",
+    "code": "Nep.Ed.432",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "43",
+    "name": "Prayogic Bhasa Bigyan",
+    "code": "Nep.Ed.433",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "44",
+    "name": "Shaityashasatra ra Nepali Samalochana",
+    "code": "Nep.Ed.434",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "45",
+    "name": "Teaching Practice",
+    "code": "Ed.440",
+    "program": "in Education",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "46",
+    "name": "Classroom Instruction",
+    "code": "Ed.442",
+    "program": "in Education",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "47",
+    "name": "Research Methodology in English",
+    "code": "Eng.Ed.445",
+    "program": "in Education",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "49",
+    "name": "Literature for Language Development",
+    "code": "Eng.Ed.446",
+    "program": "in Education",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "50",
+    "name": "Anushandhan Bidhi",
+    "code": "Nep.Ed.445",
+    "program": "in Education",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "52",
+    "name": "Bayabharik Lekhan Ra Sampadan",
+    "code": "Nep.Ed.446",
+    "program": "in Education",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "54",
+    "name": "Population Dynamics",
+    "code": "Pop.Ed.429",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "55",
+    "name": "Method of Teaching Population Education",
+    "code": "Pop.Ed.432",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "57",
+    "name": "Business Envi. & Startegic Mgmt",
+    "code": "MGT 217",
+    "program": "BBS",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "58",
+    "name": "Fundamentals of Selling",
+    "code": "MKT 250",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "59",
+    "name": "Fundamentals of Advertising",
+    "code": "MKT 253",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "60",
+    "name": "Fundamentals of Services Marketing",
+    "code": "MKT 254",
+    "program": "BBS",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "61",
+    "name": "Managerial Economics",
+    "code": "ECO 512",
+    "program": "MBS",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "63",
+    "name": "Statistical Methods",
+    "code": "MSC 514",
+    "program": "MBS",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "65",
+    "name": "Organizational Behavior",
+    "code": "MGT 515",
+    "program": "MBS",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "67",
+    "name": "Managerial Communication",
+    "code": "MGT 519",
+    "program": "MBS",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "69",
+    "name": "Financial Management",
+    "code": "FIN 510",
+    "program": "MBS",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "71",
+    "name": "Human Resource Management",
+    "code": "MGT 513",
+    "program": "MBS",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "73",
+    "name": "Production and Operations Management",
+    "code": "MSC 517",
+    "program": "MBS",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "75",
+    "name": "Management Accountancy",
+    "code": "ACC 517",
+    "program": "MBS",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "77",
+    "name": "Business Environment",
+    "code": "MGT 518",
+    "program": "MBS",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "79",
+    "name": "Accounting for Financial and Managerial Decision and Control",
+    "code": "ACC 519",
+    "program": "MBS",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "81",
+    "name": "Research Methodology",
+    "code": "MSC 521",
+    "program": "MBS",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "83",
+    "name": "International Business",
+    "code": "MGT 522",
+    "program": "MBS",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "85",
+    "name": "Entrepreneurship",
+    "code": "MGT 524",
+    "program": "MBS",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "87",
+    "name": "Corporate Finance",
+    "code": "FIN 688",
+    "program": "MBS",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "89",
+    "name": "Advertising and Promotion Management",
+    "code": "MKT 691",
+    "program": "MBS",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "91",
+    "name": "Strategic Management",
+    "code": "MGT 523",
+    "program": "MBS",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "93",
+    "name": "Financial Markets and Institutions",
+    "code": "FIN 685",
+    "program": "MBS",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "95",
+    "name": "Investment Management",
+    "code": "FIN 689",
+    "program": "MBS",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "97",
+    "name": "Consumer Behavior",
+    "code": "MKT 685",
+    "program": "MBS",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "99",
+    "name": "Services Marketing",
+    "code": "MKT 690",
+    "program": "MBS",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "101",
+    "name": "Marketing Management",
+    "code": "MKT 511",
+    "program": "MBS",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "103",
+    "name": "Foundation of Population Education",
+    "code": "Pop.Ed.418",
+    "program": "in Education",
+    "semester_or_year": "1st Year"
+  },
+  {
+    "sr": "104",
+    "name": "Population Situation of Nepal",
+    "code": "Pop.Ed.428",
+    "program": "in Education",
+    "semester_or_year": "2nd Year"
+  },
+  {
+    "sr": "105",
+    "name": "Methods of Teaching Population Education",
+    "code": "Pop.Ed.439",
+    "program": "in Education",
+    "semester_or_year": "3rd Year"
+  },
+  {
+    "sr": "107",
+    "name": "Project Work and Seminar on Population Edu.",
+    "code": "Pop.Ed.449",
+    "program": "in Education",
+    "semester_or_year": "4th Year"
+  },
+  {
+    "sr": "109",
+    "name": "Economics for Business",
+    "code": "ECO 206",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "111",
+    "name": "Cost and Management Accounting",
+    "code": "ACC 202",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "113",
+    "name": "Database Management System",
+    "code": "IT 220",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "115",
+    "name": "Web Technology II",
+    "code": "IT 239",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "117",
+    "name": "Business Data Communication and Networking",
+    "code": "IT 240",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "119",
+    "name": "Operating System",
+    "code": "IT 241",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "121",
+    "name": "Business Communication",
+    "code": "ENG 203",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "123",
+    "name": "Organizational Behavior and Human Resource Management",
+    "code": "MGT 241",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "125",
+    "name": "Discrete Structure",
+    "code": "IT 235",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "127",
+    "name": "Digital Logic",
+    "code": "IT 233",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "129",
+    "name": "Object Oriented Programming with Java",
+    "code": "IT 234",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "131",
+    "name": "English II",
+    "code": "ENG 151",
+    "program": "BHM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "132",
+    "name": "Organizational Behavior and Human Resource Management",
+    "code": "MGT 151",
+    "program": "BHM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "133",
+    "name": "Financial Accounting",
+    "code": "ACC 151",
+    "program": "BHM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "135",
+    "name": "Food Production Patisserie II",
+    "code": "BHM 151",
+    "program": "BHM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "136",
+    "name": "Food and Beverage Service II",
+    "code": "BHM 152",
+    "program": "BHM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "137",
+    "name": "Housekeeping Operations II",
+    "code": "BHM 153",
+    "program": "BHM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "138",
+    "name": "English I",
+    "code": "ENG 206",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "139",
+    "name": "Foundation of Business Management",
+    "code": "MGT 231",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "140",
+    "name": "Basic Mathematics",
+    "code": "MTH 204",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "141",
+    "name": "Foundation of Information Technology",
+    "code": "IT 231",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "142",
+    "name": "C Programming",
+    "code": "IT 232",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "143",
+    "name": "Financial Accounting",
+    "code": "ACC 201",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "144",
+    "name": "Business Statistics",
+    "code": "STT 201",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "145",
+    "name": "Microprocessor and Computer Architecture",
+    "code": "IT 236",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "146",
+    "name": "Web Technology I",
+    "code": "IT 237",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "147",
+    "name": "Data Structure and Algorithms",
+    "code": "IT 238",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "148",
+    "name": "English-I",
+    "code": "ENG 101",
+    "program": "BHM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "149",
+    "name": "Principles of Management",
+    "code": "MGT 101",
+    "program": "BHM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "150",
+    "name": "Hotel French",
+    "code": "BHM 101",
+    "program": "BHM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "151",
+    "name": "Food Production and Patisserie I",
+    "code": "BHM 102",
+    "program": "BHM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "152",
+    "name": "Food and Beverage Service I",
+    "code": "BHM 103",
+    "program": "BHM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "153",
+    "name": "Housekeeping Operations I",
+    "code": "BHM 104",
+    "program": "BHM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "154",
+    "name": "Sales and Marketing",
+    "code": "MKT 201",
+    "program": "BHM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "156",
+    "name": "Food Science and Nutrition",
+    "code": "BHM 201",
+    "program": "BHM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "157",
+    "name": "Food Production Operations",
+    "code": "BHM 202",
+    "program": "BHM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "158",
+    "name": "Bar and Beverage Service",
+    "code": "BHM 203",
+    "program": "BHM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "159",
+    "name": "Front Office Operations I",
+    "code": "BHM 204",
+    "program": "BHM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "160",
+    "name": "Organizational Behavior",
+    "code": "MGT 203",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "162",
+    "name": "Business Strategy",
+    "code": "MGT 208",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "163",
+    "name": "Management Information System",
+    "code": "IT 226",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "164",
+    "name": "Object Oriented Analysis and Design",
+    "code": "IT 227",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "165",
+    "name": "Artificial Intelligence",
+    "code": "IT 228",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "168",
+    "name": "Software Design and Development",
+    "code": "IT 242",
+    "program": "BIM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "169",
+    "name": "Programming with Python",
+    "code": "IT 243",
+    "program": "BIM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "170",
+    "name": "Information Security",
+    "code": "IT 244",
+    "program": "BIM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "171",
+    "name": "Business Research Methods",
+    "code": "RCH 201",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "172",
+    "name": "Fundamentals of Corporate Finance",
+    "code": "FIN 229",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "173",
+    "name": "Business Environment",
+    "code": "MGT 236",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "174",
+    "name": "Business Information Systems",
+    "code": "IT 245",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "175",
+    "name": "IT Ethics and Cybersecurity",
+    "code": "IT 246",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "176",
+    "name": "Project",
+    "code": "IT 352",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "177",
+    "name": "IT Entrepreneurship and Supply Chain Management",
+    "code": "IT 229",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "178",
+    "name": "Economics of Information and Communication",
+    "code": "IT 230",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "179",
+    "name": "Introduction to Computing and Information Technology",
+    "code": "ITM 101",
+    "program": "BITM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "180",
+    "name": "Structured Programming in C",
+    "code": "ITM 102",
+    "program": "BITM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "181",
+    "name": "English I",
+    "code": "ENG 103",
+    "program": "BITM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "182",
+    "name": "Foundation of Business Management",
+    "code": "MGT 103",
+    "program": "BITM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "183",
+    "name": "Basic Mathematics",
+    "code": "MTH 103",
+    "program": "BITM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "185",
+    "name": "English Composition",
+    "code": "ENG 201",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "186",
+    "name": "Basic Mathematics",
+    "code": "MTH 201",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "187",
+    "name": "Computer Information System",
+    "code": "IT 211",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "188",
+    "name": "Digital Logic Design",
+    "code": "IT 212",
+    "program": "BIM",
+    "semester_or_year": "1st Sem"
+  },
+  {
+    "sr": "189",
+    "name": "Sociology for Business",
+    "code": "SOC 201",
+    "program": "BIM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "191",
+    "name": "Discrete Mathemetics and Its Application",
+    "code": "MTH 202",
+    "program": "BIM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "192",
+    "name": "Structured Programming",
+    "code": "IT 213",
+    "program": "BIM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "193",
+    "name": "Data Communication and Computer Network",
+    "code": "IT 214",
+    "program": "BIM",
+    "semester_or_year": "2nd Sem"
+  },
+  {
+    "sr": "194",
+    "name": "Web Programming I",
+    "code": "IT 215",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "195",
+    "name": "JAVA Programming I",
+    "code": "IT 216",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "196",
+    "name": "Computer Organization",
+    "code": "IT 217",
+    "program": "BIM",
+    "semester_or_year": "3rd Sem"
+  },
+  {
+    "sr": "197",
+    "name": "Micro Economics",
+    "code": "ECO 201",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "198",
+    "name": "Data Stfucture and Algorithm With JAVA",
+    "code": "IT 218",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "199",
+    "name": "Web Programming II",
+    "code": "IT 219",
+    "program": "BIM",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "200",
+    "name": "Macro Economics",
+    "code": "ECO 202",
+    "program": "BIM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "201",
+    "name": "Computer Graphis",
+    "code": "IT 221",
+    "program": "BIM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "202",
+    "name": "Java Programming II",
+    "code": "IT 222",
+    "program": "BIM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "203",
+    "name": "Advance Internetworking",
+    "code": "IT 223",
+    "program": "BIM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "204",
+    "name": "Business Finance",
+    "code": "FIN 201",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "206",
+    "name": "Business Environment in Nepal",
+    "code": "MGT 206",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "207",
+    "name": "Software Engineering",
+    "code": "IT 224",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "208",
+    "name": "Computer Security and Cyber Law",
+    "code": "IT 225",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "209",
+    "name": "Summer Project",
+    "code": "IT 351",
+    "program": "BIM",
+    "semester_or_year": "6th Sem"
+  },
+  {
+    "sr": "210",
+    "name": "Software Project Management",
+    "code": "IT 306",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "211",
+    "name": "Operating Systems",
+    "code": "IT 307",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "212",
+    "name": "Data Mining and Data Warehousing",
+    "code": "IT 308",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "213",
+    "name": "Internship",
+    "code": "IT 350",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "214",
+    "name": "International Markets",
+    "code": "MKT 686",
+    "program": "MBS",
+    "semester_or_year": "4th Sem"
+  },
+  {
+    "sr": "215",
+    "name": "IT Entrepreneurship and Management",
+    "code": "IT 248",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "216",
+    "name": "Cloud Computing",
+    "code": "IT 277",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "217",
+    "name": "Business Intelligence",
+    "code": "IT 249",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "218",
+    "name": "Digital Economy",
+    "code": "IT 250",
+    "program": "BIM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "219",
+    "name": "Legal Environment for Hospitality",
+    "code": "BHM 328",
+    "program": "BHM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "220",
+    "name": "Entrepreneurship for Hospitality",
+    "code": "BHM 329",
+    "program": "BHM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "221",
+    "name": "Strategic Management",
+    "code": "BHM 312",
+    "program": "BHM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "222",
+    "name": "Nepalese Society and Politics",
+    "code": "SOC 202",
+    "program": "BHM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "223",
+    "name": "Quality Management",
+    "code": "BHM 451",
+    "program": "BHM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "224",
+    "name": "Organization Behavior",
+    "code": "MGT 313",
+    "program": "BHM",
+    "semester_or_year": "8th Sem"
+  },
+  {
+    "sr": "225",
+    "name": "E-Commerce and Internet Marketing",
+    "code": "IT 247",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "226",
+    "name": "Data Warehousing and Data Mining",
+    "code": "IT 274",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "227",
+    "name": "Sociology for Business Management",
+    "code": "SOC 203",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "228",
+    "name": "Strategic Management",
+    "code": "MGT 240",
+    "program": "BIM",
+    "semester_or_year": "7th Sem"
+  },
+  {
+    "sr": "229",
+    "name": "E-Commerce for Hospitality",
+    "code": "BHM 301",
+    "program": "BHM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "230",
+    "name": "Entrepreneurship",
+    "code": "MGT 301",
+    "program": "BHM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "231",
+    "name": "Event Management for Tourism and Hospitality",
+    "code": "BHM 302",
+    "program": "BHM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "232",
+    "name": "Statistics",
+    "code": "STT 301",
+    "program": "BHM",
+    "semester_or_year": "5th Sem"
+  },
+  {
+    "sr": "233",
+    "name": "Economics",
+    "code": "ECO 301",
+    "program": "BHM",
+    "semester_or_year": "5th Sem"
+  }
+]

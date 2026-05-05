@@ -1,0 +1,173 @@
+{
+  "sessionId": "817ba299-a349-4317-be0d-fddce984c5b9",
+  "metadata": {
+    "examYear": "2082",
+    "program": "B.Ed",
+    "part": "Second",
+    "enrollmentYear": "2080",
+    "resultPublishedDate": "2083/01/03",
+    "examDate": "n/a"
+  },
+  "subjects": [
+    {
+      "code": "Nep424",
+      "name": "Nepali. Bhasa Pathyakram ,Pathyapustak Sikshan Pad."
+    }
+  ],
+  "students": [
+    {
+      "sn": 1,
+      "name": "AASTHA  GIRI",
+      "rollNo": "907810001",
+      "tuRegd": "9-2-781-1-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {},
+      "total": 241,
+      "percent": 48.2,
+      "result": "Failed"
+    },
+    {
+      "sn": 2,
+      "name": "AAYUSHA  GURUNG",
+      "rollNo": "907810002",
+      "tuRegd": "9-2-781-2-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "Nep424": 49
+      },
+      "total": 271,
+      "percent": 271,
+      "result": "Passed"
+    },
+    {
+      "sn": 3,
+      "name": "ANJALI  KUNWAR",
+      "rollNo": "907810004",
+      "tuRegd": "9-2-781-4-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Nep424": 63
+      },
+      "total": 324,
+      "percent": 324,
+      "result": "Passed"
+    },
+    {
+      "sn": 4,
+      "name": "BHAWANA  CHHETRI",
+      "rollNo": "907810005",
+      "tuRegd": "9-2-781-8-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Nep424": 50
+      },
+      "total": 266,
+      "percent": 266,
+      "result": "Passed"
+    },
+    {
+      "sn": 5,
+      "name": "JYOTI  MAYA LAMGADE",
+      "rollNo": "907810006",
+      "tuRegd": "9-2-781-11-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {},
+      "total": 253,
+      "percent": 50.6,
+      "result": "Passed"
+    },
+    {
+      "sn": 6,
+      "name": "LEBIN   ROKA",
+      "rollNo": "907810007",
+      "tuRegd": "9-2-781-12-2023",
+      "ethnic": "Others",
+      "gender": "M",
+      "marks": {},
+      "total": 242,
+      "percent": 48.4,
+      "result": "Failed"
+    },
+    {
+      "sn": 7,
+      "name": "NISHA  B.K.",
+      "rollNo": "907810008",
+      "tuRegd": "9-2-288-122-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {},
+      "total": 326,
+      "percent": 65.2,
+      "result": "Passed"
+    },
+    {
+      "sn": 8,
+      "name": "PRATIMA  PANGENI",
+      "rollNo": "907810009",
+      "tuRegd": "9-2-781-13-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {},
+      "total": 200,
+      "percent": 40,
+      "result": "Failed"
+    },
+    {
+      "sn": 9,
+      "name": "RAJENDRA  PARIYAR",
+      "rollNo": "907810010",
+      "tuRegd": "9-2-781-15-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "Nep424": 40
+      },
+      "total": 184,
+      "percent": 184,
+      "result": "Failed"
+    },
+    {
+      "sn": 10,
+      "name": "ROMITA  PAUDEL",
+      "rollNo": "907810011",
+      "tuRegd": "9-2-781-16-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Nep424": 35
+      },
+      "total": 243,
+      "percent": 243,
+      "result": "Passed"
+    },
+    {
+      "sn": 11,
+      "name": "SAPANA  BK",
+      "rollNo": "907810012",
+      "tuRegd": "9-2-781-19-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {},
+      "total": 263,
+      "percent": 52.6,
+      "result": "Failed"
+    },
+    {
+      "sn": 12,
+      "name": "SARITA   NEPALI",
+      "rollNo": "907810013",
+      "tuRegd": "9-2-781-20-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {},
+      "total": 312,
+      "percent": 62.4,
+      "result": "Failed"
+    }
+  ]
+}

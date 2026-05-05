@@ -1,0 +1,37 @@
+import Link from 'next/link';
+
+export default function NoticeHub() {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1 className="section-title" style={{ margin: 0, textAlign: 'left' }}>Notice Hub</h1>
+        <Link href="/admin/notices/create" className="btn btn-primary">+ Create New Notice</Link>
+      </div>
+
+      <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead>
+            <tr style={{ background: 'var(--bg-faded)', borderBottom: '1px solid var(--border-color)' }}>
+              <th style={{ padding: '1rem', fontWeight: 600 }}>Title</th>
+              <th style={{ padding: '1rem', fontWeight: 600 }}>Category</th>
+              <th style={{ padding: '1rem', fontWeight: 600 }}>Date</th>
+              <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Demo Notice row, eventually fetched from MongoDB */}
+            <tr>
+              <td style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)' }}>वित्तीय साक्षरता सम्बन्धी कार्यक्रम सम्पन्न ।</td>
+              <td style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)' }}><span style={{ background: '#e3f2fd', color: '#1976d2', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}>News</span></td>
+              <td style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)' }}>Mar 19, 2026</td>
+              <td style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', textAlign: 'right' }}>
+                <button style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer', marginRight: '1rem', fontWeight: 600 }}>Edit</button>
+                <button style={{ background: 'none', border: 'none', color: '#d32f2f', cursor: 'pointer', fontWeight: 600 }}>Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

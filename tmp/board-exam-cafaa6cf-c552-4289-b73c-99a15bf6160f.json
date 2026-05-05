@@ -1,0 +1,279 @@
+{
+  "sessionId": "cafaa6cf-c552-4289-b73c-99a15bf6160f",
+  "metadata": {
+    "examYear": "2082",
+    "program": "B.Ed",
+    "part": "Second",
+    "enrollmentYear": "2080",
+    "resultPublishedDate": "2083/01/03",
+    "examDate": "n/a"
+  },
+  "subjects": [
+    {
+      "code": "Ed 421",
+      "name": "Educational Psychology"
+    },
+    {
+      "code": "Eng 422",
+      "name": "Expanding Horizons In English"
+    },
+    {
+      "code": "Eng 423",
+      "name": "English for Communication.Pr."
+    },
+    {
+      "code": "Eng 424",
+      "name": "Basic of Academic Writing"
+    },
+    {
+      "code": "Pop 428",
+      "name": "Population Situation of Nepal"
+    },
+    {
+      "code": "Pop 429",
+      "name": "Population Dyanamics"
+    },
+    {
+      "code": "NEP 422",
+      "name": "Bhasa Bigyan ra Nepali Bhasa"
+    },
+    {
+      "code": "Nep 423",
+      "name": "Nepali Kabita Kabya"
+    },
+    {
+      "code": "Nep424",
+      "name": "Nepali. Bhasa Pathyakram ,Pathyapustak Sikshan Pad."
+    }
+  ],
+  "students": [
+    {
+      "sn": 1,
+      "name": "AASTHA  GIRI",
+      "rollNo": "907810001",
+      "tuRegd": "9-2-781-1-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 35,
+        "Eng 422": 36,
+        "Eng 423": 28,
+        "Eng 424": 28,
+        "Pop 428": 57,
+        "Pop 429": 41
+      },
+      "total": 241,
+      "percent": 40.17,
+      "result": "Failed"
+    },
+    {
+      "sn": 2,
+      "name": "AAYUSHA  GURUNG",
+      "rollNo": "907810002",
+      "tuRegd": "9-2-781-2-2023",
+      "ethnic": "Janajati",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 44,
+        "NEP 422": 37,
+        "Nep 423": 52,
+        "Nep424": 49,
+        "Pop 428": 44,
+        "Pop 429": 45
+      },
+      "total": 271,
+      "percent": 45.17,
+      "result": "Passed"
+    },
+    {
+      "sn": 3,
+      "name": "ANJALI  KUNWAR",
+      "rollNo": "907810004",
+      "tuRegd": "9-2-781-4-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 49,
+        "NEP 422": 48,
+        "Nep 423": 53,
+        "Nep424": 63,
+        "Pop 428": 65,
+        "Pop 429": 46
+      },
+      "total": 324,
+      "percent": 54,
+      "result": "Passed"
+    },
+    {
+      "sn": 4,
+      "name": "BHAWANA  CHHETRI",
+      "rollNo": "907810005",
+      "tuRegd": "9-2-781-8-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 35,
+        "NEP 422": 35,
+        "Nep 423": 48,
+        "Nep424": 50,
+        "Pop 428": 54,
+        "Pop 429": 44
+      },
+      "total": 266,
+      "percent": 44.33,
+      "result": "Passed"
+    },
+    {
+      "sn": 5,
+      "name": "JYOTI  MAYA LAMGADE",
+      "rollNo": "907810006",
+      "tuRegd": "9-2-781-11-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 39,
+        "Eng 422": 41,
+        "Eng 423": 30,
+        "Eng 424": 41,
+        "Pop 428": 39,
+        "Pop 429": 45
+      },
+      "total": 253,
+      "percent": 42.17,
+      "result": "Passed"
+    },
+    {
+      "sn": 6,
+      "name": "LEBIN   ROKA",
+      "rollNo": "907810007",
+      "tuRegd": "9-2-781-12-2023",
+      "ethnic": "Others",
+      "gender": "M",
+      "marks": {
+        "Ed 421": 43,
+        "Eng 422": 36,
+        "Eng 423": 30,
+        "Eng 424": 26,
+        "Pop 428": 48,
+        "Pop 429": 41
+      },
+      "total": 242,
+      "percent": 40.33,
+      "result": "Failed"
+    },
+    {
+      "sn": 7,
+      "name": "NISHA  B.K.",
+      "rollNo": "907810008",
+      "tuRegd": "9-2-288-122-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 61,
+        "Eng 422": 51,
+        "Eng 423": 28,
+        "Eng 424": 50,
+        "Pop 428": 57,
+        "Pop 429": 61
+      },
+      "total": 326,
+      "percent": 54.33,
+      "result": "Passed"
+    },
+    {
+      "sn": 8,
+      "name": "PRATIMA  PANGENI",
+      "rollNo": "907810009",
+      "tuRegd": "9-2-781-13-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 26,
+        "Eng 422": 36,
+        "Eng 423": 13,
+        "Eng 424": 28,
+        "Pop 428": 45,
+        "Pop 429": 35
+      },
+      "total": 200,
+      "percent": 33.33,
+      "result": "Failed"
+    },
+    {
+      "sn": 9,
+      "name": "RAJENDRA  PARIYAR",
+      "rollNo": "907810010",
+      "tuRegd": "9-2-781-15-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 24,
+        "NEP 422": 17,
+        "Nep 423": 30,
+        "Nep424": 40,
+        "Pop 428": 38,
+        "Pop 429": 35
+      },
+      "total": 184,
+      "percent": 30.67,
+      "result": "Failed"
+    },
+    {
+      "sn": 10,
+      "name": "ROMITA  PAUDEL",
+      "rollNo": "907810011",
+      "tuRegd": "9-2-781-16-2023",
+      "ethnic": "Others",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 35,
+        "NEP 422": 49,
+        "Nep 423": 36,
+        "Nep424": 35,
+        "Pop 428": 52,
+        "Pop 429": 36
+      },
+      "total": 243,
+      "percent": 40.5,
+      "result": "Passed"
+    },
+    {
+      "sn": 11,
+      "name": "SAPANA  BK",
+      "rollNo": "907810012",
+      "tuRegd": "9-2-781-19-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 44,
+        "Eng 422": 47,
+        "Eng 423": 38,
+        "Eng 424": 37,
+        "Pop 428": 49,
+        "Pop 429": 30
+      },
+      "total": 263,
+      "percent": 43.83,
+      "result": "Failed"
+    },
+    {
+      "sn": 12,
+      "name": "SARITA   NEPALI",
+      "rollNo": "907810013",
+      "tuRegd": "9-2-781-20-2023",
+      "ethnic": "Dalits",
+      "gender": "F",
+      "marks": {
+        "Ed 421": 48,
+        "Eng 422": 62,
+        "Eng 423": 44,
+        "Eng 424": 49,
+        "Pop 428": 61,
+        "Pop 429": 30
+      },
+      "total": 312,
+      "percent": 52,
+      "result": "Failed"
+    }
+  ]
+}

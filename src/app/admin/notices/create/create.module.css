@@ -1,0 +1,70 @@
+.formWrapper {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  max-width: 800px;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.formGroup input[type="text"],
+.formGroup select,
+.formGroup textarea {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.1);
+}
+
+.fileInputWrapper {
+  border: 2px dashed var(--border-color);
+  padding: 2rem;
+  text-align: center;
+  border-radius: 6px;
+  background: var(--bg-faded);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fileInputWrapper:hover {
+  border-color: var(--accent-blue);
+  background: rgba(0, 168, 232, 0.05);
+}
+
+.fileInputWrapper input[type="file"] {
+  display: none;
+}
+
+.fileName {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--primary-blue);
+  font-weight: 600;
+}

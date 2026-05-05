@@ -1,0 +1,26 @@
+{
+  "sessionId": "6e6a92a7-a0b1-4d88-9585-33936459deb6",
+  "metadata": {
+    "examYear": "2026",
+    "program": "BBS",
+    "part": "Second",
+    "enrollmentYear": "2024",
+    "resultPublishedDate": "2082/12/05",
+    "examDate": "2081/12/02"
+  },
+  "subjects": [],
+  "students": [
+    {
+      "sn": 1,
+      "name": "",
+      "rollNo": "7-2-781-25-2023",
+      "tuRegd": "LEVEL",
+      "ethnic": "",
+      "gender": "",
+      "marks": {},
+      "total": 0,
+      "percent": 0,
+      "result": "Passed"
+    }
+  ]
+}

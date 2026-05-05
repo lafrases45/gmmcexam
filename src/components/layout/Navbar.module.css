@@ -1,0 +1,234 @@
+.nav {
+  background-color: var(--bg-white);
+  color: var(--primary-blue);
+  padding: 0.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.navbarWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logoImage {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navLinks a {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  position: relative;
+}
+
+.navLinks a:hover,
+.navLinks a.active {
+  color: var(--primary-blue);
+}
+
+.navLinks a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent-blue);
+  transition: var(--transition);
+}
+
+.navLinks a:hover::after,
+.navLinks a.active::after {
+  width: 100%;
+}
+
+.dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dropdownBtn {
+  background: none;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  font-family: inherit;
+}
+
+.dropdownBtn:hover {
+  color: var(--primary-blue);
+}
+
+.caret {
+  font-size: 0.7rem;
+  transition: transform 0.3s ease;
+}
+
+.caretUp {
+  transform: rotate(180deg);
+}
+
+.dropdownContent {
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  background-color: white;
+  min-width: 220px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.showDropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownContent a {
+  padding: 0.75rem 1.25rem;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--bg-faded);
+}
+
+.dropdownContent a::after {
+  display: none;
+}
+
+.dropdownContent a:hover {
+  background-color: var(--bg-faded);
+  color: var(--primary-blue);
+  padding-left: 1.5rem;
+}
+
+.admissionBtn {
+  background-color: var(--primary-blue);
+  color: var(--text-light) !important;
+  padding: 0.5rem 1.25rem !important;
+  border-radius: 4px;
+  opacity: 1 !important;
+  font-weight: 600 !important;
+}
+
+.admissionBtn:hover {
+  background-color: var(--secondary-blue);
+  color: var(--text-light) !important;
+  transform: translateY(-2px);
+}
+
+.admissionBtn::after {
+  display: none !important;
+}
+
+.mobileMenuBtn {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.mobileMenuBtn span {
+  width: 25px;
+  height: 3px;
+  background-color: var(--primary-blue);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.cross1 { transform: rotate(45deg) translate(5px, 5px); }
+.cross2 { opacity: 0; }
+.cross3 { transform: rotate(-45deg) translate(6px, -6px); }
+
+@media (max-width: 991px) {
+  .logoImage {
+    height: 45px;
+  }
+
+  .navLinks {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: var(--bg-white);
+    flex-direction: column;
+    padding: 2rem;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    transform: translateY(-150%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+    align-items: flex-start;
+  }
+
+  .navLinks.activeMenu {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .dropdownContent {
+    position: static;
+    box-shadow: none;
+    transform: none;
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    margin-left: 1rem;
+    border-left: 2px solid var(--bg-faded);
+    margin-top: 0;
+  }
+
+  .showDropdown {
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+    margin-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .mobileMenuBtn {
+    display: flex;
+  }
+}
+
+@media (max-width: 991px) {
+  .navLinks {
+    display: none;
+  }
+  
+  .mobileMenuBtn {
+    display: flex;
+  }
+}
