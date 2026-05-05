@@ -1331,26 +1331,25 @@ export default function AdminPanel({
             </div>
           )}
 
-
-            {wizardStep === 5 && editingExam && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                  <h3>Results Ledger — {editingExam.name}</h3>
-                  <button onClick={() => setWizardStep(4)} style={{ padding: '0.5rem 1rem', background: '#f1f5f9', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>← Back to Dashboard</button>
-                </div>
-                <LedgerManager exams={groupExams.length > 0 ? groupExams : [editingExam]} />
+          {wizardStep === 5 && editingExam && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h3>Results Ledger — {editingExam.name}</h3>
+                <button onClick={() => setWizardStep(4)} style={{ padding: '0.5rem 1rem', background: '#f1f5f9', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>← Back to Dashboard</button>
               </div>
-            )}
+              <LedgerManager exams={groupExams.length > 0 ? groupExams : [editingExam]} />
+            </div>
+          )}
 
-            {wizardStep === 6 && editingExam && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                  <h3>Result Analysis Reports</h3>
-                  <button onClick={() => setWizardStep(4)} style={{ padding: '0.5rem 1rem', background: '#f1f5f9', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>← Back to Dashboard</button>
-                </div>
-                <ResultReports exams={groupExams.length > 0 ? groupExams : [editingExam]} />
+          {wizardStep === 6 && editingExam && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h3>Result Analysis Reports</h3>
+                <button onClick={() => setWizardStep(4)} style={{ padding: '0.5rem 1rem', background: '#f1f5f9', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>← Back to Dashboard</button>
               </div>
-            )}
+              <ResultReports exams={groupExams.length > 0 ? groupExams : [editingExam]} />
+            </div>
+          )}
         </React.Fragment>
       )}
 
