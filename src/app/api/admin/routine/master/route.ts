@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       groupSubjectsData
     );
 
-    return new Response(pdfBytes, {
+    return new Response(pdfBytes as any, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

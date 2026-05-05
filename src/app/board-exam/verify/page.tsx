@@ -130,7 +130,7 @@ export default function VerifyPage() {
     const data = filteredStudents.map((s, idx) => ({
       "SN": idx + 1,
       "Roll No": s.rollNo,
-      "Name": s.fullName,
+      "Name": s.name,
       "Gender": s.gender,
       "Ethnic Group": s.ethnic
     }));

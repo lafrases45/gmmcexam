@@ -22,7 +22,7 @@ export interface Student {
   rollNo: string;
   tuRegd: string;
   ethnic: EthnicGroup | "";
-  gender: "Male" | "Female" | "Other" | "";
+  gender: "Male" | "Female" | "Other" | "M" | "F" | "";
   major?: string;
   marks: Record<string, number | "AB">;
   total: number;

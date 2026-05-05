@@ -137,7 +137,7 @@ export default function SeatPlanPage() {
 
       if (students.length > currentCapacity) {
         setConfig(prev => ({ ...prev, studentsPerBench: 3 }));
-        showToast('Capacity Warning: 2 per bench is not enough. Switched to 3 per bench.', 'info');
+        showToast('Capacity Warning: 2 per bench is not enough. Switched to 3 per bench.', 'success');
       }
     }
   }, [

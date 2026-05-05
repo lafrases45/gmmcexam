@@ -107,7 +107,7 @@ export async function generateLedgerExcel(metadata: ExamMetadata, subjects: Subj
   };
 
   const buffer = await workbook.xlsx.writeBuffer();
-  return buffer as Buffer;
+  return Buffer.from(buffer as any);
 }
 
 // --- PDF Ledger ---
@@ -294,8 +294,9 @@ export async function generateResultReportPdf(metadata: ExamMetadata, subjects: 
     let f_dalit = 0, f_edj = 0, f_janajati = 0, f_other = 0;
 
     students.filter(filterFn).forEach(s => {
-      const isM = s.gender === 'M';
-      const isF = s.gender === 'F';
+      const g = s.gender?.toString().toUpperCase() || '';
+      const isM = g.startsWith('M');
+      const isF = g.startsWith('F');
       const eth = s.ethnic;
 
       if (isM) {

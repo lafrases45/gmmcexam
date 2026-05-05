@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     // Use 'inline' for PDFs to allow browser preview, 'attachment' for Excel
     const disposition = contentType === 'application/pdf' ? 'inline' : 'attachment';
 
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(fileBuffer as any, {
       status: 200,
       headers: {
         'Content-Type': contentType,

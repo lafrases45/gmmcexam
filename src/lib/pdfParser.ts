@@ -18,7 +18,7 @@ export async function parsePdfBuffer(buffer: Buffer): Promise<{ students: Studen
     const pageText = chunks[i];
     if (!pageText.trim()) continue;
 
-    const lines = pageText.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = pageText.split('\n').map((l: string) => l.trim()).filter(Boolean);
     if (lines.length < 10) continue;
 
     // 1. Name is the first line
@@ -27,7 +27,7 @@ export async function parsePdfBuffer(buffer: Buffer): Promise<{ students: Studen
     // 2. Find Roll No and Regd No
     let rollNo = '';
     let tuRegd = '';
-    const rollIndex = lines.findIndex(l => l.toUpperCase().includes('ROLL NO:'));
+    const rollIndex = lines.findIndex((l: string) => l.toUpperCase().includes('ROLL NO:'));
     if (rollIndex !== -1 && rollIndex + 2 < lines.length) {
       tuRegd = lines[rollIndex + 1];
       rollNo = lines[rollIndex + 2];
@@ -102,7 +102,7 @@ export async function parsePdfBuffer(buffer: Buffer): Promise<{ students: Studen
     let total = 0;
     let resultRaw = '';
     
-    const totalIndex = lines.findIndex(l => l.toUpperCase().includes('TOTAL MARKS'));
+    const totalIndex = lines.findIndex((l: string) => l.toUpperCase().includes('TOTAL MARKS'));
     if (totalIndex !== -1 && totalIndex + 3 < lines.length) {
       // Structure:
       // TOTAL MARKS

@@ -38,7 +38,7 @@ export default function AdminPanel({
   profiles?: any[]
 }) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'exams' | 'subjects' | 'teachers'>('exams')
+  const [activeTab, setActiveTab] = useState<'exams' | 'subjects' | 'teachers' | 'ledger' | 'report'>('exams')
   const [exams, setExams] = useState(initialExams)
   const [results, setResults] = useState([])
   const [ledger, setLedger] = useState(initialLedger)
@@ -1130,7 +1130,7 @@ export default function AdminPanel({
                                         const otherCode = (other.subjects?.code || '').replace(/\s+/g, '').toUpperCase();
                                         const otherName = (other.subjects?.name || '').replace(/\s+/g, '').toUpperCase();
                                         if (otherCode === normCode && otherName === normName) {
-                                          next[other.subject_id] = val;
+                                          (next as any)[other.subject_id] = val;
                                         }
                                       });
                                     }
