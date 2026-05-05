@@ -8,7 +8,9 @@ export const dynamic = 'force-dynamic'
 
 export default async function ExamsPage() {
   const role = await getUserRole()
-  
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   // Fetch common data
   const exams = await getExams()
   const subjects = await getSubjects()
@@ -17,9 +19,15 @@ export default async function ExamsPage() {
   const ledger = role === 'Admin' ? await getLedger() : []
   
   // Teacher data for Admin Panel
-  const { getTeacherRegistry, getProfiles } = await import('@/lib/actions/exam-actions')
+  const { getTeacherRegistry, getProfiles, getTeacherDashboardData } = await import('@/lib/actions/exam-actions')
   const teacherRegistry = role === 'Admin' ? await getTeacherRegistry() : []
   const profiles = role === 'Admin' ? await getProfiles() : []
+
+  // Data for Teacher Panel (only if not admin, or as empty for TS)
+  const { assignments: teacherAssignments, exams: teacherExams } = 
+    role !== 'Admin' 
+      ? await getTeacherDashboardData(user?.email || '', user?.id || '') 
+      : { assignments: [], exams: [] }
 
   return (
     <div className={styles.examContainer}>
@@ -33,7 +41,7 @@ export default async function ExamsPage() {
           profiles={profiles}
         />
       ) : (
-        <TeacherPanel exams={exams} subjects={subjects} />
+        <TeacherPanel initialExams={teacherExams} initialAssignments={teacherAssignments} />
       )}
     </div>
   )
