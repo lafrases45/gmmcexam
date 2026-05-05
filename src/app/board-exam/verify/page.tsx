@@ -1,7 +1,7 @@
 "use client";
 export const dynamic = 'force-dynamic';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useBoardExamStore, EthnicGroup } from '@/lib/boardExamStore';
 import * as XLSX from 'xlsx';
@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 const ETHNIC_OPTIONS: EthnicGroup[] = ["Janajati", "Madeshi", "Dalits", "EDJ", "Others"];
 const GENDER_OPTIONS = ["M", "F", "Other"];
 
-export default function VerifyPage() {
+function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionIdQuery = searchParams.get('session');
@@ -491,7 +491,14 @@ export default function VerifyPage() {
           </button>
         </div>
       </div>
-
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20">Loading verify panel...</div>}>
+      <VerifyContent />
+    </Suspense>
   );
 }

@@ -2,9 +2,9 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useBoardExamStore } from '@/lib/boardExamStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
-export default function OutputPage() {
+function OutputContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session');
   const router = useRouter();
@@ -167,8 +167,14 @@ export default function OutputPage() {
           </button>
         </div>
       </div>
-
-      {/* Preview removed for production compatibility */}
     </div>
+  );
+}
+
+export default function OutputPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20">Preparing downloads...</div>}>
+      <OutputContent />
+    </Suspense>
   );
 }
