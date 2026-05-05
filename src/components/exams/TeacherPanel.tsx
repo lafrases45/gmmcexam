@@ -19,31 +19,45 @@ export default function TeacherPanel({ initialExams, initialAssignments }: { ini
   const [showGuide, setShowGuide] = useState(false)
   const router = useRouter()
 
-  // Realtime subscription
+  // Realtime subscription - Optimized to avoid global "thundering herd" refreshes
   useEffect(() => {
     const supabase = createBrowserClient()
     
-    const channel = supabase
-      .channel('teacher-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'exams' }, () => {
-        router.refresh()
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'results' }, () => {
-        router.refresh()
-        // Re-fetch current subject data if active
-        if (activeExamIdRef.current && selectedSubjectRef.current) {
-          refreshStudents()
-        }
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_subjects' }, () => {
-        router.refresh()
-      })
+    // Listen for structure changes (new exams/subjects) - infrequent, so refresh is fine
+    const structureChannel = supabase
+      .channel('teacher-structure')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'exams' }, () => router.refresh())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_subjects' }, () => router.refresh())
       .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
+    // Listen for result changes ONLY for the active subject
+    let resultsChannel: any = null
+    if (activeExamId && selectedSubject) {
+      resultsChannel = supabase
+        .channel(`results-${activeExamId}-${selectedSubject}`)
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'results',
+          filter: `exam_id=eq.${activeExamId}`
+        }, (payload: any) => {
+          // Only refresh if the subject matches AND it's not our own change 
+          // (Actually, checking subject_id in filter is better but Supabase filters have limits, 
+          // so we check payload in the handler)
+          if (payload.new && payload.new.subject_id === selectedSubject) {
+            // We don't router.refresh() here because it's too heavy.
+            // Instead, we just re-fetch the specific student list.
+            refreshStudents()
+          }
+        })
+        .subscribe()
     }
-  }, [router])
+
+    return () => {
+      supabase.removeChannel(structureChannel)
+      if (resultsChannel) supabase.removeChannel(resultsChannel)
+    }
+  }, [activeExamId, selectedSubject, router])
 
   useEffect(() => {
     const hasSeenGuide = localStorage.getItem('gmmc_teacher_guide_seen')

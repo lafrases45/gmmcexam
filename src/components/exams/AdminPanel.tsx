@@ -1214,94 +1214,123 @@ export default function AdminPanel({
                  >
                    📄 {examGroupId ? 'Master Routine' : 'PDF'}
                  </button>
-               )}
-             </div>
-          </div>
-          )}
-
-          {/* ── STEP 4: Exam Dashboard (Management Hub) */}
+               )}          {/* ── STEP 4: Exam Dashboard (Management Hub) */}
           {wizardStep === 4 && editingExam && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.2rem', color: '#0f172a' }}>{editingExam.name}</h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.3rem' }}>
+                  <h3 style={{ fontSize: '1.4rem', color: '#003292', fontWeight: 800 }}>{editingExam.name}</h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.4rem' }}>
                     {groupExams.length > 0 ? (
                       groupExams.map(ex => (
-                        <span key={ex.id} style={{ fontSize: '0.75rem', background: '#f1f5f9', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid #e2e8f0' }}>{ex.program} {ex.year_or_semester}</span>
+                        <span key={ex.id} style={{ fontSize: '0.75rem', background: '#eef2ff', color: '#4338ca', padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid #c7d2fe', fontWeight: 600 }}>{ex.program} {ex.year_or_semester}</span>
                       ))
                     ) : (
                       <p style={{ fontSize: '0.85rem', color: '#64748b' }}>{editingExam.program} — {editingExam.year_or_semester}</p>
                     )}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={handleBackToList} style={{ padding: '0.5rem 1rem', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>← All Exams</button>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button 
+                    onClick={async () => {
+                      const rep = await getMissingMarksReport(editingExam.id)
+                      setMissingReport(rep)
+                    }}
+                    style={{ padding: '0.5rem 1rem', background: 'white', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                  >
+                    <RefreshCw size={14} /> Refresh Status
+                  </button>
+                  <button onClick={handleBackToList} style={{ padding: '0.5rem 1rem', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>← All Exams</button>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <StepCard num={1} label="Basic Info & Multi-Program Selection" status={examGroupId ? `${groupExams.length} Programs involved` : editingExam.name} color="green" action={() => setWizardStep(1)} actionLabel="Edit" />
-                <StepCard num={2} label="Subjects Selection" status={existingMarks.length > 0 ? `${existingMarks.length} total subjects across programs` : 'Not set up'} color={existingMarks.length > 0 ? 'green' : 'yellow'} action={() => setWizardStep(2)} actionLabel={existingMarks.length > 0 ? 'Review' : 'Set Up →'} />
-                <StepCard num={3} label="Consolidated Exam Schedule (Dates)" status={routineData.length > 0 ? `${routineData.length} dated slots ready` : 'No dates set'} color={routineData.length > 0 ? 'green' : 'yellow'} action={() => setWizardStep(3)} actionLabel={routineData.length > 0 ? 'Edit' : 'Set Dates →'} />
-                <StepCard 
-                  num={4} 
-                  label="Student List Sync" 
-                  status={ledger.some((r: any) => r.exam_id === editingExam.id) ? 'Students synced' : 'Sync needed'} 
-                  color={ledger.some((r: any) => r.exam_id === editingExam.id) ? 'green' : 'yellow'} 
-                  action={() => window.location.href = '/admin/seat-plan'} 
-                  actionLabel="Go to Seat Plan →" 
-                />
-                <div style={{ 
-                  padding: '1.25rem', 
-                  border: `1px solid ${missingReport.length === 0 && ledger.some(r => r.exam_id === editingExam.id) ? '#bbf7d0' : '#fef08a'}`, 
-                  borderRadius: '12px', 
-                  background: missingReport.length === 0 && ledger.some(r => r.exam_id === editingExam.id) ? '#f0fdf4' : '#fefce8' 
-                }}>
-                  <p style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.95rem', marginBottom: '0.75rem' }}>5. Teachers & Marks Status</p>
-                  {missingReport.length > 0 ? (
-                    <div style={{ fontSize: '0.85rem' }}>
-                      <p style={{ color: '#dc2626', fontWeight: 600, marginBottom: '0.5rem' }}>⚠️ Action Required: {missingReport.length} items incomplete</p>
-                      <div style={{ maxHeight: '200px', overflowY: 'auto', background: 'rgba(255,255,255,0.5)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)' }}>
-                        <ul style={{ paddingLeft: '0', margin: '0', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                          {missingReport.map((m, i) => (
-                            <li key={i} style={{ padding: '0.4rem', borderBottom: i < missingReport.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                              <div style={{ fontWeight: 700, color: '#0f172a' }}>{m.subject_name} ({m.program})</div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.1rem' }}>
-                                <span style={{ color: m.status === 'Sync Needed' ? '#f59e0b' : '#dc2626', fontWeight: 600 }}>{m.status}</span>
-                                <span style={{ color: '#64748b' }}>{m.teacher_names}</span>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.5rem' }}>
+                {/* Left Side: Core Setup */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className={styles.card} style={{ margin: 0, padding: '1.5rem' }}>
+                    <h4 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Layout size={18} /> Exam Configuration</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <StepCard num={1} label="Basic Settings & Programs" status="Modify name, dates, or programs" color="blue" action={() => setWizardStep(1)} actionLabel="Edit" />
+                      <StepCard num={2} label="Subjects & Full/Pass Marks" status={`${existingMarks.length} subjects configured`} color="blue" action={() => setWizardStep(2)} actionLabel="Manage" />
+                      <StepCard num={3} label="Routine & Examination Dates" status={routineData.length > 0 ? `${routineData.length} dated slots` : 'Schedule empty'} color={routineData.length > 0 ? 'green' : 'yellow'} action={() => setWizardStep(3)} actionLabel="Edit Schedule" />
+                      <StepCard num={4} label="Student List & Seat Plan" status="Sync students from system" color="blue" action={() => window.location.href = '/admin/seat-plan'} actionLabel="Go to Seat Plan" />
                     </div>
-                  ) : <p style={{ fontSize: '0.85rem', color: '#16a34a', fontWeight: 600 }}>✅ All subjects across all programs have marks entered.</p>}
-                </div>
-                  <button
-                    onClick={() => { if (missingReport.length > 0) { alert('Cannot publish! Please ensure all teachers have submitted marks.') } else { alert('Bulk Publish feature coming soon! Update individual exam status to Completed in the list for now.') } }}
-                    style={{ width: '100%', marginTop: '0.5rem', padding: '1rem', background: missingReport.length > 0 ? '#94a3b8' : '#16a34a', color: 'white', borderRadius: '10px', border: 'none', cursor: missingReport.length > 0 ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: '1.1rem', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  >
-                    {missingReport.length > 0 ? `🔒 Cannot Publish — ${missingReport.length} missing` : '🚀 Bulk Publish Exam Results'}
-                  </button>
+                  </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <button 
-                      onClick={() => setWizardStep(5)} // Step 5 for Ledger
-                      style={{ padding: '1rem', background: 'white', border: '2px solid #003292', color: '#003292', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                      onClick={() => setWizardStep(5)} 
+                      style={{ padding: '1.25rem', background: 'white', border: '2px solid #003292', color: '#003292', borderRadius: '16px', fontWeight: 800, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }}
+                      onMouseOver={e => e.currentTarget.style.background = '#f8fafc'}
+                      onMouseOut={e => e.currentTarget.style.background = 'white'}
                     >
-                      📋 View Ledger
+                      <FileText size={24} />
+                      View Full Ledger
                     </button>
                     <button 
-                      onClick={() => setWizardStep(6)} // Step 6 for Reports
-                      style={{ padding: '1rem', background: 'white', border: '2px solid #003292', color: '#003292', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                      onClick={() => setWizardStep(6)} 
+                      style={{ padding: '1.25rem', background: 'white', border: '2px solid #003292', color: '#003292', borderRadius: '16px', fontWeight: 800, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }}
+                      onMouseOver={e => e.currentTarget.style.background = '#f8fafc'}
+                      onMouseOut={e => e.currentTarget.style.background = 'white'}
                     >
-                      📊 Result Reports
+                      <BarChart3 size={24} />
+                      Result Reports
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right Side: Status Summary */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div style={{ 
+                    padding: '1.5rem', 
+                    border: `1px solid ${missingReport.length === 0 && ledger.some(r => r.exam_id === editingExam.id) ? '#bbf7d0' : '#fef08a'}`, 
+                    borderRadius: '16px', 
+                    background: missingReport.length === 0 && ledger.some(r => r.exam_id === editingExam.id) ? '#f0fdf4' : '#fefce8',
+                    height: '100%'
+                  }}>
+                    <h4 style={{ fontWeight: 800, color: '#1e293b', fontSize: '1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <CheckCircle size={18} /> Teacher Marks Status
+                    </h4>
+                    {missingReport.length > 0 ? (
+                      <div style={{ fontSize: '0.85rem' }}>
+                        <p style={{ color: '#dc2626', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <AlertCircle size={14} /> {missingReport.length} items incomplete
+                        </p>
+                        <div style={{ maxHeight: '350px', overflowY: 'auto', background: 'rgba(255,255,255,0.7)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                          <ul style={{ paddingLeft: '0', margin: '0', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {missingReport.map((m, i) => (
+                              <li key={i} style={{ paddingBottom: '0.75rem', borderBottom: i < missingReport.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
+                                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' }}>{m.subject_name}</div>
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>{m.program} — {m.year}</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.4rem' }}>
+                                  <span style={{ color: m.status === 'Sync Needed' ? '#f59e0b' : '#dc2626', fontWeight: 800, background: m.status === 'Sync Needed' ? '#fffbeb' : '#fef2f2', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>{m.status}</span>
+                                  <span style={{ color: '#475569', fontStyle: 'italic' }}>{m.teacher_names}</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
+                        <p style={{ fontSize: '0.95rem', color: '#16a34a', fontWeight: 700 }}>All marks are submitted!</p>
+                        <p style={{ fontSize: '0.8rem', color: '#16a34a', opacity: 0.8 }}>You can now publish the results.</p>
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={() => { if (missingReport.length > 0) { alert('Cannot publish! Please ensure all teachers have submitted marks.') } else { alert('Bulk Publish feature coming soon!') } }}
+                      style={{ width: '100%', marginTop: '1.5rem', padding: '1rem', background: missingReport.length > 0 ? '#cbd5e1' : '#16a34a', color: 'white', borderRadius: '12px', border: 'none', cursor: missingReport.length > 0 ? 'not-allowed' : 'pointer', fontWeight: 800, fontSize: '1rem', boxShadow: missingReport.length > 0 ? 'none' : '0 10px 15px -3px rgba(22, 163, 74, 0.3)' }}
+                    >
+                      {missingReport.length > 0 ? `🔒 Publish Locked (${missingReport.length} missing)` : '🚀 Publish Exam Results'}
                     </button>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+          )}
+
 
             {wizardStep === 5 && editingExam && (
               <div>
