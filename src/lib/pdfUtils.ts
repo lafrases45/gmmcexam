@@ -1,7 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { Bench, Student } from './seatPlan';
-import fs from 'fs';
-import path from 'path';
 
 const CAMPUS_NAME = "Gupteshwor Mahadev Multiple Campus Pokhara-17, Chhorepatan";
 

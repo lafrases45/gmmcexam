@@ -5,9 +5,6 @@ export async function parsePdfBuffer(buffer: Buffer): Promise<{ students: Studen
   const data = await pdf(buffer);
   const text = data.text;
   
-  // Debug: Dump raw text to a file so we can inspect it
-  require('fs').writeFileSync('raw_pdf_output.txt', text, 'utf-8');
-  
   // Split the text by 'NAME :' to ensure we get every student even if page breaks (\f) are missing
   const chunks = text.split(/NAME\s*:/i);
 

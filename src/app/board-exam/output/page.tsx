@@ -12,6 +12,11 @@ export default function OutputPage() {
 
   // Fallback state logic to prevent flash on invalid session
   const [isValid, setIsValid] = useState(true);
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  const students = useBoardExamStore(state => state.students);
+  const subjects = useBoardExamStore(state => state.subjects);
+  const metadata = useBoardExamStore(state => state.metadata);
 
   useEffect(() => {
     if (!sessionId) {
@@ -30,14 +35,41 @@ export default function OutputPage() {
     );
   }
 
-  const metadata = useBoardExamStore(state => state.metadata);
   const fileNameBase = metadata 
     ? `${metadata.program}_${metadata.part}_Year_${metadata.examYear}`.replace(/\s+/g, '_')
     : '';
 
-  const excelUrl = `/api/board-exam/download?session=${sessionId}&type=excel&name=${fileNameBase}`;
-  const ledgerPdfUrl = `/api/board-exam/download?session=${sessionId}&type=ledger-pdf&name=${fileNameBase}`;
-  const reportPdfUrl = `/api/board-exam/download?session=${sessionId}&type=report-pdf&name=${fileNameBase}`;
+  const handleDownload = async (type: string, filename: string) => {
+    try {
+      setDownloading(type);
+      const response = await fetch('/api/board-exam/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionData: { metadata, subjects, students },
+          type,
+          customName: filename
+        })
+      });
+
+      if (!response.ok) throw new Error('Download failed');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename + (type === 'excel' ? '.xlsx' : '.pdf');
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to download file');
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   const handleStartNew = () => {
     clearSession();
@@ -75,10 +107,18 @@ export default function OutputPage() {
           </div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">Mark Ledger (Excel)</h3>
           <p className="text-sm text-gray-500 mb-6 flex-1">Formatted mark ledger with all student data, colors, and styling.</p>
-          <a href={excelUrl} download className="w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition inline-flex items-center justify-center gap-2">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          <button 
+            onClick={() => handleDownload('excel', fileNameBase)} 
+            disabled={!!downloading}
+            className="w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition inline-flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {downloading === 'excel' ? (
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            )}
             Download .xlsx
-          </a>
+          </button>
         </div>
 
         {/* Card 2: PDF Ledger */}
@@ -90,10 +130,18 @@ export default function OutputPage() {
           </div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">Mark Ledger (PDF)</h3>
           <p className="text-sm text-gray-500 mb-6 flex-1">Printable mark ledger in landscape PDF format (A3 size recommended).</p>
-          <a href={ledgerPdfUrl} download className="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition inline-flex items-center justify-center gap-2">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          <button 
+            onClick={() => handleDownload('ledger-pdf', fileNameBase + '_Mark_Ledger')} 
+            disabled={!!downloading}
+            className="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition inline-flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {downloading === 'ledger-pdf' ? (
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            )}
             Download PDF
-          </a>
+          </button>
         </div>
 
         {/* Card 3: Report PDF */}
@@ -105,21 +153,22 @@ export default function OutputPage() {
           </div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">Result Report (PDF)</h3>
           <p className="text-sm text-gray-500 mb-6 flex-1">Official result summary report with statistics and best students (A4 size).</p>
-          <a href={reportPdfUrl} download className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition inline-flex items-center justify-center gap-2">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          <button 
+            onClick={() => handleDownload('report-pdf', fileNameBase + '_Result_Report')} 
+            disabled={!!downloading}
+            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition inline-flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {downloading === 'report-pdf' ? (
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            )}
             Download Report
-          </a>
+          </button>
         </div>
       </div>
 
-      {/* Optional Preview Pane */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col" style={{ height: '600px' }}>
-        <div className="bg-gray-50 border-b px-4 py-3 font-medium text-sm text-gray-700 flex justify-between items-center">
-          <span>Report Preview</span>
-          <a href={reportPdfUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Open in new tab</a>
-        </div>
-        <iframe src={reportPdfUrl} className="w-full flex-1 bg-gray-100" title="Report PDF Preview" />
-      </div>
+      {/* Preview removed for production compatibility */}
     </div>
   );
 }

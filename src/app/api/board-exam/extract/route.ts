@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parsePdfBuffer } from '@/lib/pdfParser';
-import { writeSessionJson } from '@/lib/tempStore';
+// import { writeSessionJson } from '@/lib/tempStore';
 import { ExamMetadata } from '@/lib/boardExamStore';
 import crypto from 'crypto';
 
@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
       students
     };
 
-    // Save to temp file
-    await writeSessionJson(sessionId, sessionData);
+    // Save to temp file - Disabled for Cloudflare
+    // await writeSessionJson(sessionId, sessionData);
 
     // Return session data to client
     return NextResponse.json(sessionData);

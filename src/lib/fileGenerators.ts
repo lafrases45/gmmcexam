@@ -2,11 +2,9 @@ import ExcelJS from 'exceljs';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ExamMetadata, Student, Subject, EthnicGroup } from './boardExamStore';
-import path from 'path';
-import fs from 'fs/promises';
 
 // --- Excel Ledger ---
-export async function generateLedgerExcel(metadata: ExamMetadata, subjects: Subject[], students: Student[], filePath: string): Promise<void> {
+export async function generateLedgerExcel(metadata: ExamMetadata, subjects: Subject[], students: Student[]): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('Mark Ledger', { views: [{ state: 'frozen', ySplit: 6 }] });
 
@@ -108,11 +106,12 @@ export async function generateLedgerExcel(metadata: ExamMetadata, subjects: Subj
     to: { row: 6, column: columns.length }
   };
 
-  await workbook.xlsx.writeFile(filePath);
+  const buffer = await workbook.xlsx.writeBuffer();
+  return buffer as Buffer;
 }
 
 // --- PDF Ledger ---
-export async function generateLedgerPdf(metadata: ExamMetadata, subjects: Subject[], students: Student[], filePath: string): Promise<void> {
+export async function generateLedgerPdf(metadata: ExamMetadata, subjects: Subject[], students: Student[]): Promise<Buffer> {
   const doc = new jsPDF('l', 'pt', 'a4') as any;
   const pageWidth = doc.internal.pageSize.width;
 
@@ -243,24 +242,18 @@ export async function generateLedgerPdf(metadata: ExamMetadata, subjects: Subjec
   });
 
   const pdfBytes = doc.output('arraybuffer');
-  await fs.writeFile(filePath, Buffer.from(pdfBytes));
+  return Buffer.from(pdfBytes);
 }
 
 // --- Report PDF ---
-export async function generateResultReportPdf(metadata: ExamMetadata, subjects: Subject[], students: Student[], filePath: string): Promise<void> {
+export async function generateResultReportPdf(metadata: ExamMetadata, subjects: Subject[], students: Student[]): Promise<Buffer> {
   const doc = new jsPDF('p', 'pt', 'a4');
   const pageWidth = doc.internal.pageSize.width;
 
   // Header
-  try {
-    const logoPath = path.join(process.cwd(), 'public', 'images', 'logo.png');
-    const logoBuffer = await fs.readFile(logoPath);
-    const logoBase64 = logoBuffer.toString('base64');
-    // Place logo on the left
-    doc.addImage(logoBase64, 'PNG', 40, 30, 55, 55);
-  } catch (err) {
-    console.error("Logo not found at public/images/logo.png");
-  }
+  // Logo handling - in serverless, we usually fetch or use base64
+  // For now, we skip logo if fs is not available, or it should be passed in
+  // doc.addImage(logoBase64, 'PNG', 40, 30, 55, 55);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
@@ -544,5 +537,5 @@ export async function generateResultReportPdf(metadata: ExamMetadata, subjects: 
   doc.text("Program Coordinator", pageWidth - 180, finalY4 + 30);
 
   const pdfBytes = doc.output('arraybuffer');
-  await fs.writeFile(filePath, Buffer.from(pdfBytes));
+  return Buffer.from(pdfBytes);
 }
