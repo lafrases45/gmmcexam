@@ -135,7 +135,7 @@ export default function AdmissionRecords() {
       activeDoc.setFontSize(12);
       activeDoc.text("Student List", 14, finalY + 15);
 
-      const studentRows = batchStudents.map((s, idx) => [
+      const studentRows = batchStudents.map((s: any, idx: number) => [
         idx + 1,
         s.name,
         s.gender === 'M' ? 'Male' : 'Female',
