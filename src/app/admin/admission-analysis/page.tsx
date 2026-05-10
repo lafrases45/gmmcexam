@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -20,6 +20,71 @@ export default function AdmissionAnalysis() {
   const [students, setStudents] = useState<Student[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
+  
+  const [batchesList, setBatchesList] = useState<any[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState('');
+  const [isLoadedFromDb, setIsLoadedFromDb] = useState(false);
+
+  useEffect(() => {
+    const fetchInitial = async () => {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      let allBatches: any[] = [];
+      const { data: batches } = await supabase.from('admission_batches').select('id, name, total_students').order('created_at', { ascending: false });
+      if (batches) {
+        setBatchesList(batches);
+        allBatches = batches;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const batchId = params.get('batchId');
+      if (batchId) {
+        setSelectedBatchId(batchId);
+        await loadBatchData(batchId, allBatches, supabase);
+      }
+    };
+    fetchInitial();
+  }, []);
+
+  const loadBatchData = async (batchId: string, availableBatches: any[], supabaseClient: any) => {
+    try {
+      setIsUploading(true);
+      setError('');
+      const batch = availableBatches.find((b: any) => b.id === batchId) || (await supabaseClient.from('admission_batches').select('name').eq('id', batchId).single()).data;
+      if (batch) setBatchName(batch.name);
+
+      const { data: stds, error: fetchErr } = await supabaseClient.from('admission_students').select('*').eq('batch_id', batchId);
+      if (fetchErr) throw fetchErr;
+
+      const parsed: Student[] = stds.map((s: any, idx: number) => ({
+        sn: idx + 1,
+        name: s.name,
+        gender: s.gender as Gender,
+        ethnic: s.ethnic_group as EthnicGroup,
+        tuRegd: s.tu_regd_no || s.roll_no || ''
+      }));
+
+      setStudents(parsed);
+      setIsLoadedFromDb(true);
+    } catch (err: any) {
+      setError('Error loading batch: ' + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDropdownChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedBatchId(val);
+    if (!val) {
+      setStudents([]);
+      setIsLoadedFromDb(false);
+      setBatchName('');
+      return;
+    }
+    const { createClient } = await import('@/lib/supabase/client');
+    await loadBatchData(val, batchesList, createClient());
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -284,22 +349,59 @@ export default function AdmissionAnalysis() {
         </a>
       </div>
 
-      {/* Upload Section */}
+      {/* Upload or Select Section */}
       <div className="bg-white p-6 rounded-xl shadow-sm border mb-6">
-        <h2 className="text-lg font-semibold mb-4">Upload Student List (PDF or Excel)</h2>
-        <div className="flex items-center gap-4">
-          <input
-            type="file"
-            accept=".xlsx, .xls, .csv, .pdf"
-            onChange={handleFileUpload}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-          />
-          {isUploading && <span className="text-sm text-blue-600">Processing...</span>}
-        </div>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-        <p className="mt-4 text-xs text-gray-500 italic">
-          * Supported columns for Excel: Name, Gender (M/F), Ethnic Group (Dalit, EDJ, Janajati, Other). PDF extraction will try to guess values.
-        </p>
+        {isLoadedFromDb ? (
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-lg font-semibold text-blue-800">Analyzing Batch: {batchName}</h2>
+              <p className="text-sm text-gray-500">Data loaded directly from the admissions registry.</p>
+            </div>
+            <button 
+              onClick={() => { setIsLoadedFromDb(false); setStudents([]); setSelectedBatchId(''); setBatchName(''); window.history.replaceState({}, '', '/admin/admission-analysis'); }}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Analyze a Different Batch
+            </button>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-lg font-semibold mb-4">Select Batch for Analysis</h2>
+            <div className="flex gap-4 items-center mb-6">
+              <select 
+                value={selectedBatchId} 
+                onChange={handleDropdownChange}
+                className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 w-full max-w-md outline-none"
+              >
+                <option value="">-- Choose an Existing Batch --</option>
+                {batchesList.map(b => (
+                  <option key={b.id} value={b.id}>{b.name} ({b.total_students} students)</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="relative flex py-5 items-center">
+              <div className="flex-grow border-t border-gray-200"></div>
+              <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-semibold tracking-wider">OR UPLOAD NEW</span>
+              <div className="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            <h2 className="text-md font-semibold mb-4 text-gray-700">Upload Student List (PDF or Excel)</h2>
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept=".xlsx, .xls, .csv, .pdf"
+                onChange={handleFileUpload}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+              />
+              {isUploading && <span className="text-sm text-blue-600">Processing...</span>}
+            </div>
+            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+            <p className="mt-4 text-xs text-gray-500 italic">
+              * Supported columns for Excel: Name, Gender (M/F), Ethnic Group (Dalit, EDJ, Janajati, Other). PDF extraction will try to guess values.
+            </p>
+          </>
+        )}
       </div>
 
       {students.length > 0 && (
@@ -309,13 +411,15 @@ export default function AdmissionAnalysis() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Admission Summary</h2>
               <div className="flex gap-3 items-center">
-                <input 
-                  type="text"
-                  placeholder="Enter Batch Name (e.g. BBS 2026)"
-                  value={batchName}
-                  onChange={(e) => setBatchName(e.target.value)}
-                  className="px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-64"
-                />
+                {!isLoadedFromDb && (
+                  <input 
+                    type="text"
+                    placeholder="Enter Batch Name (e.g. BBS 2026)"
+                    value={batchName}
+                    onChange={(e) => setBatchName(e.target.value)}
+                    className="px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-64"
+                  />
+                )}
                 <button 
                   onClick={downloadPDFReport}
                   className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition shadow-sm border"
@@ -325,27 +429,29 @@ export default function AdmissionAnalysis() {
                   </svg>
                   Download PDF
                 </button>
-                <button 
-                  onClick={saveToDatabase}
-                  disabled={isSaving}
-                  className={`flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition shadow-sm ${saveSuccess ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'}`}
-                >
-                  {isSaving ? (
-                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : saveSuccess ? (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                  )}
-                  {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Results'}
-                </button>
+                {!isLoadedFromDb && (
+                  <button 
+                    onClick={saveToDatabase}
+                    disabled={isSaving}
+                    className={`flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition shadow-sm ${saveSuccess ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+                  >
+                    {isSaving ? (
+                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    ) : saveSuccess ? (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                      </svg>
+                    )}
+                    {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Results'}
+                  </button>
+                )}
               </div>
             </div>
             <div className="overflow-x-auto">

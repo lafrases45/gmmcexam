@@ -1,9 +1,15 @@
 .examContainer {
-  padding: 1.5rem 2rem;
-  background-color: #f1f5f9;
+  padding: 2rem 3rem;
+  background-color: #f8fafc;
   min-height: calc(100vh - 64px);
   font-family: 'Inter', -apple-system, sans-serif;
   color: #1e293b;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .header {
@@ -61,6 +67,12 @@
   color: #1e40af;
   background: #eff6ff !important;
   box-shadow: inset 0 0 0 1px #bfdbfe;
+}
+
+.hoverCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.1);
+  border-color: #dbeafe !important;
 }
 
 /* Dashboard Cards */
@@ -232,3 +244,29 @@
 .badgeUpcoming { background: #fefce8; color: #854d0e; border: 1px solid #fef08a; }
 .badgeOngoing { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
 .badgeCompleted { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+
+.operateBtn {
+  padding: 1.5rem 3.5rem;
+  font-size: 1.4rem;
+  border-radius: 18px;
+  background: #1e40af;
+  color: white;
+  font-weight: 800;
+  box-shadow: 0 15px 25px -5px rgba(30, 64, 175, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.operateBtn:hover {
+  background: #1e3a8a;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 25px 35px -10px rgba(30, 64, 175, 0.5);
+}
+
+.operateBtn:active {
+  transform: translateY(0) scale(0.98);
+}

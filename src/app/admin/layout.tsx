@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { usePrefetchData } from '@/lib/hooks/usePrefetchData';
 import styles from './admin.module.css';
 import { 
   LayoutDashboard, BookOpen, ClipboardList, BarChart3, 
@@ -20,27 +22,30 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
-  const [loading, setLoading] = useState(true);
+  const { session, loading } = useAuth();
+  usePrefetchData();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isLoginPage = pathname === '/admin/login';
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session && !isLoginPage) {
-        router.push('/admin/login');
-      }
-      setLoading(false);
-    };
-    checkSession();
-  }, [isLoginPage, router, supabase.auth]);
+    if (!loading && !session && !isLoginPage) {
+      router.push('/admin/login');
+    }
+  }, [session, loading, isLoginPage, router]);
 
-  if (loading && !isLoginPage) {
-    return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-      <div style={{ width: '40px', height: '40px', border: '3px solid #cbd5e1', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>;
+  // Only show the full-screen spinner on the initial load when there's no session yet.
+  // Once we have a session or have determined there isn't one, we let the children handle their own loading states.
+  if (loading && !session && !isLoginPage) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ width: '40px', height: '40px', border: '3px solid #cbd5e1', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+          <p style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Verifying Session...</p>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
   }
 
   if (isLoginPage) return <>{children}</>;
@@ -53,21 +58,22 @@ export default function AdminLayout({
   const navItems = [
     { category: 'EXAMS', items: [
       { name: 'Board Exams', icon: BookOpen, href: '/admin/board-exams' },
-      { name: 'Internal Exams', icon: ClipboardList, href: '/admin/exams' },
+      { name: 'Internal Exams', icon: ClipboardList, href: '/admin/internal-exams' },
       { name: 'Seat Plan', icon: Layout, href: '/admin/seat-plan' },
       { name: 'Results', icon: FileText, href: '/admin/results' },
     ]},
     { category: 'TEACHERS', items: [
-      { name: 'Teacher List', icon: Users, href: '/admin/exams?tab=teachers' },
-      { name: 'Assign Subjects', icon: UserCheck, href: '/admin/exams?tab=teachers' },
-      { name: 'Marks Entry', icon: ClipboardList, href: '/teacher/login' },
+      { name: 'Teacher List', icon: Users, href: '/admin/internal-exams?tab=teachers' },
+      { name: 'Assign Subjects', icon: UserCheck, href: '/admin/internal-exams?tab=teachers' },
     ]},
     { category: 'STUDENTS', items: [
+      { name: 'Admissions', icon: UserPlus, href: '/admin/admissions' },
       { name: 'Student List', icon: GraduationCap, href: '/admin/students' },
       { name: 'Student Promotion', icon: UserPlus, href: '/admin/promotion' },
     ]},
     { category: 'REPORTS', items: [
-      { name: 'Exam Reports', icon: BarChart3, href: '/admin/exams?tab=report' },
+      { name: 'Admission Analysis', icon: Activity, href: '/admin/admission-analysis' },
+      { name: 'Exam Reports', icon: BarChart3, href: '/admin/internal-exams?tab=report' },
       { name: 'Marks Reports', icon: Activity, href: '/admin/reports' },
       { name: 'Analytics', icon: BarChart3, href: '/admin/analytics' },
     ]},

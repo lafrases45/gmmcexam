@@ -1,9 +1,10 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ETHNIC_OPTIONS, EthnicGroup, Gender } from '@/lib/studentAnalysisUtils';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -25,40 +26,42 @@ interface Student {
 }
 
 export default function AdmissionRecords() {
-  const [batches, setBatches] = useState<Batch[]>([]);
+  const queryClient = useQueryClient();
+  const supabase = createClient();
+  
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingStudents, setLoadingStudents] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const supabase = createClient();
+  // Fetch all batches
+  const { data: batches = [], isLoading: loading } = useQuery({
+    queryKey: ['admission-records-batches'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admission_batches')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as Batch[];
+    }
+  });
 
-  useEffect(() => {
-    fetchBatches();
-  }, []);
+  // Fetch students for selected batch
+  const { data: students = [], isLoading: loadingStudents } = useQuery({
+    queryKey: ['admission-records-students', selectedBatch?.id],
+    queryFn: async () => {
+      if (!selectedBatch) return [];
+      const { data, error } = await supabase
+        .from('admission_students')
+        .select('*')
+        .eq('batch_id', selectedBatch.id);
+      if (error) throw error;
+      return data as Student[];
+    },
+    enabled: !!selectedBatch
+  });
 
-  const fetchBatches = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('admission_batches')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (!error) setBatches(data);
-    setLoading(false);
-  };
-
-  const fetchBatchDetails = async (batch: Batch) => {
+  const fetchBatchDetails = (batch: Batch) => {
     setSelectedBatch(batch);
-    setLoadingStudents(true);
-    const { data, error } = await supabase
-      .from('admission_students')
-      .select('*')
-      .eq('batch_id', batch.id);
-
-    if (!error) setStudents(data);
-    setLoadingStudents(false);
   };
 
   const deleteBatch = async (id: string) => {
@@ -70,7 +73,7 @@ export default function AdmissionRecords() {
       .eq('id', id);
 
     if (!error) {
-      setBatches(batches.filter(b => b.id !== id));
+      queryClient.invalidateQueries({ queryKey: ['admission-records-batches'] });
       if (selectedBatch?.id === id) setSelectedBatch(null);
       setSelectedIds(selectedIds.filter(sid => sid !== id));
     }

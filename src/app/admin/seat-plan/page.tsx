@@ -21,6 +21,12 @@ import {
   getSeatPlans, 
   deleteSeatPlan 
 } from '@/lib/actions/exam-actions';
+import { getBatches, getStudentsByBatch } from '@/lib/actions/student-actions';
+import { useBatches } from '@/lib/hooks/useBatches';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { useExamsData } from '@/lib/hooks/useExamsData';
+import { RefreshCw } from 'lucide-react';
+import { toast as globalToast } from '@/lib/store/useToastStore';
 
 export default function SeatPlanPage() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -36,29 +42,40 @@ export default function SeatPlanPage() {
   const [savedPlans, setSavedPlans] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
+  const [savedBatches, setSavedBatches] = useState<any[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState('');
+
   // Custom UI State
-  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ message: string, onConfirm: () => void } | null>(null);
   const ignoreNextGeneration = React.useRef(false);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    if (type === 'success') globalToast.success(message);
+    else globalToast.error(message);
   };
 
+  const { session } = useAuth();
+  const { data: batchesData } = useBatches();
+  const { data: examsData, isLoading: isLoadingExams } = useExamsData(session?.user);
+
   useEffect(() => {
-    getExams().then(data => {
-      setExams(data);
+    if (examsData?.exams) {
+      const data = examsData.exams;
+      setExams(data); // Populate the local exams state for lookups
+      
       const groups: Record<string, any[]> = {}
-      data.forEach(exam => {
+      data.forEach((exam: any) => {
         const id = exam.group_id || `single-${exam.id}`
         if (!groups[id]) groups[id] = []
         groups[id].push(exam)
       })
       setGroupedExams(Object.values(groups))
-    }).catch(console.error);
-    getSeatPlans().then(setSavedPlans).catch(console.error);
-  }, []);
+    }
+  }, [examsData]);
+
+  useEffect(() => {
+    if (batchesData) setSavedBatches(batchesData);
+  }, [batchesData]);
   
   const [config, setConfig] = useState<SeatPlanConfig>({
     roomName: PRESET_ROOMS[0].name,
@@ -566,7 +583,7 @@ export default function SeatPlanPage() {
                         }}
                         style={{ padding: '0.25rem', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: 'white', outline: 'none' }}
                       >
-                        <option value="">Auto (Fallback)</option>
+                        <option key="default" value="">Auto (Fallback)</option>
                         {getOrderedPrograms(students).map(p => <option key={p} value={p}>{p}</option>)}
                       </select>
                     </div>
@@ -811,7 +828,11 @@ export default function SeatPlanPage() {
                   }}
                   style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '2px solid #3b82f644', fontSize: '0.85rem', background: '#f8fafc' }}
                 >
-                  <option value="">-- Select Exam Batch --</option>
+                  <option key="default" value="">
+                    {isLoadingExams ? '-- Loading Exams... --' : 
+                     groupedExams.length === 0 ? '-- No Exams Found --' : 
+                     '-- Select Exam Batch --'}
+                  </option>
                   {groupedExams.map(group => {
                     const first = group[0];
                     const label = group.length > 1 
@@ -839,7 +860,7 @@ export default function SeatPlanPage() {
                       onChange={e => setSelectedProgram(e.target.value)}
                       style={{ flex: 1 }}
                     >
-                      <option value="">-- Program --</option>
+                      <option key="default" value="">-- Program --</option>
                       {(() => {
                         const currentGroup = groupedExams.find(g => (g[0].group_id || `single-${g[0].id}`) === selectedGroupId) || [];
                         const programs = Array.from(new Set(currentGroup.map(e => e.program)));
@@ -853,7 +874,7 @@ export default function SeatPlanPage() {
                       style={{ flex: 1 }}
                       disabled={!selectedProgram}
                     >
-                      <option value="">-- Term --</option>
+                      <option key="default" value="">-- Term --</option>
                       {(() => {
                         const currentGroup = groupedExams.find(g => (g[0].group_id || `single-${g[0].id}`) === selectedGroupId) || [];
                         const terms = currentGroup
@@ -898,49 +919,80 @@ export default function SeatPlanPage() {
                       }
                       
                       const lines = quickPaste.split('\n').filter(l => l.trim().length > 0);
-                      const pasted = lines.map(line => {
-                        // Try tab first (Excel/Sheets), then comma, then multiple spaces
-                        let parts = line.split('\t');
-                        if (parts.length < 2) parts = line.split(',');
-                        if (parts.length < 2) {
-                          // Fallback: split by first space/whitespace after the roll number
-                          const match = line.trim().match(/^([^\s,]+)[\s,]+(.+)$/);
-                          if (match) parts = [match[1], match[2]];
-                        }
-                        
-                        const roll = parts[0]?.trim() || '';
-                        const name = parts[1]?.trim() || '';
-                        
+                      const parsed: Student[] = lines.map(line => {
+                        const parts = line.split(/[,\t]/);
                         return {
-                          roll,
-                          name,
+                          roll: parts[0]?.trim(),
+                          name: parts[1]?.trim() || 'Unknown',
                           program: `${selectedProgram} ${selectedTerm}`,
                           major: selectedMajor || undefined
                         };
-                      }).filter(s => s.roll && s.name);
+                      }).filter(s => s.roll);
                       
-                      setStudents(prev => [...prev, ...pasted]);
+                      setStudents(prev => [...prev, ...parsed]);
                       setQuickPaste('');
-                      setSelectedProgram('');
-                      setSelectedTerm('');
-                      setSelectedMajor('');
-                      showToast(`${pasted.length} students added successfully!`);
+                      showToast(`${parsed.length} students added from Quick Paste.`);
                     }}
-                    disabled={!quickPaste.trim()}
-                    style={{ width: '100%', marginTop: '0.25rem', padding: '0.4rem', fontSize: '0.75rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    style={{ width: '100%', marginTop: '0.5rem', padding: '0.5rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
                   >
-                    Add from Paste
+                    Add Pasted Students
                   </button>
                 </div>
 
-                <div style={{ border: '2px dashed #0070f31a', padding: '1rem', textAlign: 'center', borderRadius: '8px', marginBottom: '1rem' }}>
-                  <input type="file" accept=".xlsx, .xls, .csv" onChange={handleFileUpload} id="excel-upload" style={{ display: 'none' }} />
-                  <label htmlFor="excel-upload" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                    <FileText size={18} color="#3b82f6" />
-                    <span style={{ fontSize: '0.8rem' }}>Upload Excel (Roll, Name, Major)</span>
-                  </label>
+                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 'bold', color: '#0f172a' }}>Load from Admissions Registry</label>
+                  <select 
+                    className={styles.formInput} 
+                    value={selectedBatchId} 
+                    onChange={e => setSelectedBatchId(e.target.value)}
+                    style={{ width: '100%', marginBottom: '0.5rem' }}
+                  >
+                    <option key="default" value="">-- Select Admission Batch --</option>
+                    {savedBatches.map(b => (
+                      <option key={b.id} value={b.id}>{b.name} ({b.total_students} students)</option>
+                    ))}
+                  </select>
+                  <button 
+                    onClick={async () => {
+                      if (!selectedProgram || !selectedTerm) {
+                        showToast('Please select a program and year before loading.', 'error');
+                        return;
+                      }
+                      if (!selectedBatchId) {
+                        showToast('Please select a batch.', 'error');
+                        return;
+                      }
+                      
+                      const batchStudents = await getStudentsByBatch(selectedBatchId);
+                      const parsed: Student[] = batchStudents.map(s => ({
+                        roll: s.tu_regd_no || s.id.slice(0,6).toUpperCase(), // Fallback to partial ID if no TU Regd
+                        name: s.name,
+                        program: `${selectedProgram} ${selectedTerm}`,
+                        major: selectedMajor || undefined
+                      }));
+                      
+                      setStudents(prev => [...prev, ...parsed]);
+                      setSelectedBatchId('');
+                      showToast(`${parsed.length} students loaded from Registry.`);
+                    }}
+                    style={{ width: '100%', padding: '0.5rem', background: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                  >
+                    Load Batch Students
+                  </button>
                 </div>
-              </div>
+
+                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                  <p style={{ fontSize: '0.85rem', marginBottom: '0.5rem', color: '#64748b' }}>Or upload from an Excel file:</p>
+
+                  <div style={{ border: '2px dashed #0070f31a', padding: '1rem', textAlign: 'center', borderRadius: '8px', marginBottom: '1rem' }}>
+                    <input type="file" accept=".xlsx, .xls, .csv" onChange={handleFileUpload} id="excel-upload" style={{ display: 'none' }} />
+                    <label htmlFor="excel-upload" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                      <FileText size={18} color="#3b82f6" />
+                      <span style={{ fontSize: '0.8rem' }}>Upload Excel (Roll, Name, Major)</span>
+                    </label>
+                  </div>
+                </div>
+
 
               {students.length > 0 && (
                 <div style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
@@ -993,6 +1045,7 @@ export default function SeatPlanPage() {
               )}
             </div>
           </div>
+        </div>
 
           {/* Export Card */}
           <div className={styles.card} style={{ gridColumn: '1 / -1' }}>
@@ -1137,18 +1190,6 @@ export default function SeatPlanPage() {
       </div>
 
       {/* CUSTOM UI COMPONENTS */}
-      {toast && (
-        <div style={{
-          position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000,
-          background: toast.type === 'success' ? '#10b981' : '#ef4444',
-          color: 'white', padding: '0.75rem 1.5rem', borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)', animation: 'slideIn 0.3s ease-out',
-          display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '500'
-        }}>
-          {toast.message}
-        </div>
-      )}
-
       {confirmModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',

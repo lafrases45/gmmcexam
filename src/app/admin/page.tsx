@@ -1,5 +1,4 @@
 'use client';
-export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './admin.module.css';
@@ -7,63 +6,45 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useBoardExamStore } from '@/lib/boardExamStore';
 import { exportSystemData, restoreSystemData } from '@/lib/actions/exam-actions';
+import { useDashboardStats } from '@/lib/hooks/useDashboardStats';
+import { toast } from '@/lib/store/useToastStore';
 import { 
   Save, RefreshCw, ShieldCheck, CheckCircle, 
   Layout, ClipboardList, Users, BookOpen, 
   Plus, Search, ArrowRight, Clock, Calendar, 
   CheckSquare, TrendingUp, Database, Shield,
-  ArrowUpRight, MoreHorizontal
+  ArrowUpRight, MoreHorizontal, Activity
 } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const [boardExams, setBoardExams] = useState<any[]>([]);
-  const [internalStats, setInternalStats] = useState({ totalExams: 0, activeExams: 0 });
-  const [teacherCount, setTeacherCount] = useState(0);
-  const [studentCount, setStudentCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-  const router = useRouter();
-  const { setSession } = useBoardExamStore();
-  
+  const { data: stats, isLoading } = useDashboardStats();
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    async function fetchData() {
-      // Fetch Board Exams
-      const { data: boardData } = await supabase
-        .from('board_exams')
-        .select('*')
-        .order('updated_at', { ascending: false });
-      
-      // Fetch Internal Exam Stats
-      const { data: internalData } = await supabase
-        .from('exams')
-        .select('id, status');
-      
-      // Fetch Teacher Registry Count
-      const { count: teachers } = await supabase
-        .from('teacher_registry')
-        .select('*', { count: 'exact', head: true });
+  // Map RPC data to component variables
+  const boardExams = stats?.board_exams || [];
+  const internalStats = {
+    totalExams: stats?.internal_exams?.length || 0,
+    activeExams: stats?.internal_exams?.filter((e: any) => e.status === 'Ongoing').length || 0
+  };
+  const teacherCount = stats?.teacher_count || 0;
+  const studentCount = stats?.student_stats?.total || 0;
+  
+  const colors = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#64748b', '#06b6d4', '#f43f5e'];
+  const ethnicData = stats?.student_stats?.ethnic_groups?.map((eg: any, i: number) => ({
+    ...eg,
+    color: colors[i % colors.length]
+  })) || [];
 
-      // Fetch Student Count
-      const { count: students } = await supabase
-        .from('admission_students')
-        .select('*', { count: 'exact', head: true });
-      
-      if (boardData) setBoardExams(boardData);
-      if (internalData) {
-        setInternalStats({
-          totalExams: internalData.length,
-          activeExams: internalData.filter(e => e.status === 'Ongoing').length
-        });
-      }
-      if (teachers !== null) setTeacherCount(teachers);
-      if (students !== null) setStudentCount(students);
-      setLoading(false);
-    }
-    fetchData();
-  }, [supabase]);
+  if (isLoading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <RefreshCw className={styles.spinner} />
+        <p>Optimizing Dashboard...</p>
+      </div>
+    );
+  }
 
   const handleBackup = async () => {
     setIsBackingUp(true);
@@ -77,9 +58,9 @@ export default function AdminDashboard() {
       a.click();
       URL.revokeObjectURL(url);
       localStorage.setItem('last_emis_backup', JSON.stringify(data));
-      alert('System backup completed! File downloaded.');
+      toast.success('System backup completed! File downloaded.');
     } catch (err: any) {
-      alert('Backup failed: ' + err.message);
+      toast.error('Backup failed: ' + err.message);
     } finally {
       setIsBackingUp(false);
     }
@@ -95,10 +76,10 @@ export default function AdminDashboard() {
       const text = await file.text();
       const backup = JSON.parse(text);
       await restoreSystemData(backup);
-      alert('System recovery complete!');
+      toast.success('System recovery complete!');
       router.refresh();
     } catch (err: any) {
-      alert('Restore failed: ' + err.message);
+      toast.error('Restore failed: ' + err.message);
     } finally {
       setIsRestoring(false);
       if (e.target) e.target.value = '';
@@ -109,7 +90,7 @@ export default function AdminDashboard() {
     <div className="animate-in fade-in duration-700">
       <div className={styles.pageHeader}>
         <h1>Welcome back, Admin 👋</h1>
-        <p>Here's what's happening with your institution today.</p>
+        <p>Here&apos;s what&apos;s happening with your institution today.</p>
       </div>
 
       {/* Top Stats Row */}
@@ -123,7 +104,7 @@ export default function AdminDashboard() {
           </div>
           <h4>Total Exams</h4>
           <p>{internalStats.totalExams + boardExams.length}</p>
-          <Link href="/admin/exams">View all exams &rarr;</Link>
+          <Link href="/admin/internal-exams">View all exams &rarr;</Link>
         </div>
 
         <div className={styles.statCard}>
@@ -135,7 +116,7 @@ export default function AdminDashboard() {
           </div>
           <h4>Pending Marks Entry</h4>
           <p>28</p>
-          <Link href="/admin/exams?tab=teachers">View pending &rarr;</Link>
+          <Link href="/admin/internal-exams?tab=teachers">View pending &rarr;</Link>
         </div>
 
         <div className={styles.statCard}>
@@ -182,7 +163,7 @@ export default function AdminDashboard() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <CheckSquare size={20} color="#1e293b" />
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Today's Tasks</h3>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Today&apos;s Tasks</h3>
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -231,32 +212,29 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Upcoming Exams */}
+        {/* Student Demographics */}
         <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Calendar size={20} color="#1e293b" />
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Upcoming Exams</h3>
+              <Users size={20} color="#1e293b" />
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Student Demographics</h3>
             </div>
-            <Link href="#" style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View calendar</Link>
+            <Link href="/admin/admissions" style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View all</Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {[
-              { date: 'MAY 10', title: 'BBS 2nd Year - Internal Exam', type: 'Upcoming', color: '#22c55e' },
-              { date: 'MAY 20', title: 'BBS 4th Year - Board Exam', type: 'Board Exam', color: '#f59e0b' },
-              { date: 'JUN 05', title: 'BBS 1st Year - Final Exam', type: 'Internal', color: '#3b82f6' },
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
-                <div style={{ background: '#f8fafc', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', minWidth: '50px' }}>
-                  <p style={{ fontSize: '0.6rem', color: '#3b82f6', fontWeight: 800, margin: 0 }}>{item.date.split(' ')[0]}</p>
-                  <p style={{ fontSize: '0.9rem', color: '#1e293b', fontWeight: 800, margin: 0 }}>{item.date.split(' ')[1]}</p>
+            {ethnicData.length > 0 ? ethnicData.map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color }} />
+                  <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>{item.name}</p>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>{item.title}</p>
-                  <span style={{ fontSize: '0.6rem', color: item.color, fontWeight: 700 }}>{item.type}</span>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>
+                  {item.count} <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 500 }}>students</span>
                 </div>
               </div>
-            ))}
+            )) : (
+              <p style={{ fontSize: '0.8rem', color: '#64748b' }}>No demographic data available.</p>
+            )}
           </div>
         </div>
       </div>
@@ -301,11 +279,11 @@ export default function AdminDashboard() {
         <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
           <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 700 }}>Quick Actions</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-             <Link href="/admin/exams" style={{ padding: '1rem', background: '#f0fdf4', borderRadius: '16px', textDecoration: 'none' }}>
+             <Link href="/admin/internal-exams" style={{ padding: '1rem', background: '#f0fdf4', borderRadius: '16px', textDecoration: 'none' }}>
                 <Plus size={18} color="#22c55e" />
                 <p style={{ fontSize: '0.75rem', fontWeight: 700, margin: '0.5rem 0 0 0', color: '#166534' }}>Create Exam</p>
              </Link>
-             <Link href="/admin/exams?tab=teachers" style={{ padding: '1rem', background: '#eff6ff', borderRadius: '16px', textDecoration: 'none' }}>
+             <Link href="/admin/internal-exams?tab=teachers" style={{ padding: '1rem', background: '#eff6ff', borderRadius: '16px', textDecoration: 'none' }}>
                 <Users size={18} color="#3b82f6" />
                 <p style={{ fontSize: '0.75rem', fontWeight: 700, margin: '0.5rem 0 0 0', color: '#1e40af' }}>Assign Subjects</p>
              </Link>
@@ -349,12 +327,9 @@ export default function AdminDashboard() {
           <button onClick={handleBackup} disabled={isBackingUp} style={{ width: '100%', marginTop: '1.5rem', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '0.8rem', fontWeight: 700, color: '#475569', cursor: 'pointer' }}>
             {isBackingUp ? 'Processing...' : 'Run Manual Backup'}
           </button>
-        </div>
       </div>
     </div>
+  </div>
   );
 }
-
-// Fixed import for Activity
-import { Activity } from 'lucide-react';
 

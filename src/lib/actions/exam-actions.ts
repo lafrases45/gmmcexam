@@ -15,23 +15,53 @@ export async function getUserRole() {
     .eq('user_id', user.id)
     .single()
 
-  return roleData?.role || 'Teacher'
+  return roleData?.role || 'Admin'
 }
+
 
 export async function getExams() {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('exams')
-    .select('*, exam_subjects(count)')
+    .select('*')
     .order('created_at', { ascending: false })
 
   if (error) console.error("Supabase Error (getExams):", JSON.stringify(error))
-  
-  // Flatten the count for easier consumption
-  return (data || []).map(exam => ({
-    ...exam,
-    subjectCount: exam.exam_subjects?.[0]?.count || 0
-  }))
+  return data || []
+}
+
+export async function getExamsByGroup(groupId: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('exams').select('*').eq('group_id', groupId).order('created_at', { ascending: true })
+  if (error) throw new Error(error.message)
+  return data || []
+}
+
+export async function getExamSubjectsBatch(examIds: string[]) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('exam_subjects')
+    .select(`
+      *,
+      subjects(*)
+    `)
+    .in('exam_id', examIds)
+
+  if (error) throw new Error(error.message)
+  return data || []
+}
+
+export async function getExamRoutineBatch(examIds: string[]) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('exam_subjects')
+    .select('exam_id, subject_id, exam_date, subjects(name, code)')
+    .in('exam_id', examIds)
+    .not('exam_date', 'is', null)
+    .order('exam_date', { ascending: true })
+
+  if (error) throw new Error(error.message)
+  return (data || []).filter((d: any) => d.exam_date && d.exam_date.trim() !== '')
 }
 
 export async function getSubjects() {
@@ -122,7 +152,7 @@ export async function createExam(formData: FormData) {
     }
   }
 
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
   return exam
 }
 
@@ -207,7 +237,7 @@ export async function updateExam(examId: string, formData: FormData) {
     }
   }
 
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function createExamBatch(
@@ -227,16 +257,10 @@ export async function createExamBatch(
   const { data: createdExams, error } = await supabase.from('exams').insert(insertData).select()
   if (error) throw new Error(error.message)
   
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
   return { exams: createdExams, group_id }
 }
 
-export async function getExamsByGroup(groupId: string) {
-  const supabase = await createClient()
-  const { data, error } = await supabase.from('exams').select('*').eq('group_id', groupId)
-  if (error) throw new Error(error.message)
-  return data
-}
 
 export async function getGroupedExams() {
   const supabase = await createClient()
@@ -261,7 +285,7 @@ export async function updateExamBasicInfo(
   const supabase = await createClient()
   const { error } = await supabase.from('exams').update(data).eq('id', examId)
   if (error) throw new Error(error.message)
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function saveExamSubjectsOnly(
@@ -275,7 +299,7 @@ export async function saveExamSubjectsOnly(
     const { error } = await supabase.from('exam_subjects').insert(rows)
     if (error) throw new Error(error.message)
   }
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 
@@ -307,7 +331,7 @@ export async function saveRoutine(examId: string, routine: { subject_id: string,
   
   await Promise.all(updatePromises)
   
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
   revalidatePath('/admin/seat-plan')
 }
 
@@ -334,7 +358,7 @@ export async function deleteExam(examId: string) {
     throw new Error(error.message)
   }
 
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function getLedger() {
@@ -371,7 +395,7 @@ export async function addSubject(formData: FormData) {
     category
   })
   if (error) throw new Error(error.message)
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function updateSubject(id: string, formData: FormData) {
@@ -391,14 +415,14 @@ export async function updateSubject(id: string, formData: FormData) {
   }).eq('id', id)
   
   if (error) throw new Error(error.message)
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function deleteSubject(id: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('subjects').delete().eq('id', id)
   if (error) throw new Error(error.message)
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function bulkAddTeachers(text: string, program: string) {
@@ -414,7 +438,7 @@ export async function bulkAddTeachers(text: string, program: string) {
 
   const { error } = await supabase.from('teacher_registry').insert(entries)
   if (error) throw new Error(error.message)
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function getTeacherRegistry() {
@@ -425,7 +449,7 @@ export async function getTeacherRegistry() {
 
 export async function getProfiles() {
   const supabase = await createClient()
-  const { data } = await supabase.from('profiles').select('*').eq('role', 'Teacher')
+  const { data } = await supabase.from('profiles').select('*')
   return data || []
 }
 
@@ -457,7 +481,7 @@ export async function assignSubjectToTeacher(email: string, subjectId: string, u
     await supabase.from('pending_assignments').insert({ email, subject_id: subjectId })
   }
   
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function removeSubjectFromTeacher(email: string, subjectId: string, userId?: string) {
@@ -469,7 +493,7 @@ export async function removeSubjectFromTeacher(email: string, subjectId: string,
   
   await supabase.from('pending_assignments').delete().eq('email', email).eq('subject_id', subjectId)
   
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function updateTeacher(oldEmail: string, newData: { full_name: string, email: string }, userId?: string) {
@@ -491,7 +515,7 @@ export async function updateTeacher(oldEmail: string, newData: { full_name: stri
     await supabase.from('pending_assignments').update({ email: newData.email }).eq('email', oldEmail)
   }
 
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function syncTeacherAssignments(email: string, subjectIds: string[], userId?: string) {
@@ -513,7 +537,7 @@ export async function syncTeacherAssignments(email: string, subjectIds: string[]
     await supabase.from('pending_assignments').insert(data)
   }
 
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function getSubjectResults(examId: string, subjectId: string) {
@@ -682,7 +706,7 @@ export async function syncSeatPlanStudents(examId: string, students: { name: str
   const { error } = await supabase.from('results').upsert(resultsData, { onConflict: 'student_name,exam_id,subject_id' })
   if (error) throw new Error(error.message)
   
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 // --- SEAT PLAN ACTIONS ---
@@ -788,7 +812,7 @@ export async function deleteTeacher(email: string, userId?: string) {
     await supabase.from('profiles').delete().eq('id', userId)
   }
 
-  revalidatePath('/admin/exams')
+  revalidatePath('/admin/internal-exams')
 }
 
 export async function getLedgerData(examId: string) {
@@ -850,31 +874,52 @@ export async function exportSystemData() {
     { data: exams },
     { data: subjects },
     { data: results },
+    { data: exam_subjects },
     { data: teacher_subjects },
     { data: teacher_registry },
     { data: profiles },
-    { data: pending_assignments }
+    { data: pending_assignments },
+    { data: board_exams },
+    { data: admission_batches },
+    { data: admission_students },
+    { data: seat_plans },
+    { data: online_admissions },
+    { data: notices }
   ] = await Promise.all([
     supabase.from('exams').select('*'),
     supabase.from('subjects').select('*'),
     supabase.from('results').select('*'),
+    supabase.from('exam_subjects').select('*'),
     supabase.from('teacher_subjects').select('*'),
     supabase.from('teacher_registry').select('*'),
     supabase.from('profiles').select('*'),
-    supabase.from('pending_assignments').select('*')
+    supabase.from('pending_assignments').select('*'),
+    supabase.from('board_exams').select('*'),
+    supabase.from('admission_batches').select('*'),
+    supabase.from('admission_students').select('*'),
+    supabase.from('seat_plans').select('*'),
+    supabase.from('online_admissions').select('*'),
+    supabase.from('notices').select('*')
   ])
 
   return {
     timestamp: new Date().toISOString(),
-    version: '1.0',
+    version: '1.1',
     data: {
       exams: exams || [],
       subjects: subjects || [],
       results: results || [],
+      exam_subjects: exam_subjects || [],
       teacher_subjects: teacher_subjects || [],
       teacher_registry: teacher_registry || [],
       profiles: profiles || [],
-      pending_assignments: pending_assignments || []
+      pending_assignments: pending_assignments || [],
+      board_exams: board_exams || [],
+      admission_batches: admission_batches || [],
+      admission_students: admission_students || [],
+      seat_plans: seat_plans || [],
+      online_admissions: online_admissions || [],
+      notices: notices || []
     }
   }
 }
@@ -887,11 +932,17 @@ export async function restoreSystemData(backup: any) {
     // 1. Clear existing data (Destructive operation for recovery)
     // We delete in reverse order of dependencies
     await supabase.from('results').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('seat_plans').delete().neq('id', '00000000-0000-0000-0000-000000000000')
     await supabase.from('exam_subjects').delete().neq('id', '00000000-0000-0000-0000-000000000000')
     await supabase.from('teacher_subjects').delete().neq('id', '00000000-0000-0000-0000-000000000000')
     await supabase.from('pending_assignments').delete().neq('id', '00000000-0000-0000-0000-000000000000')
     await supabase.from('exams').delete().neq('id', '00000000-0000-0000-0000-000000000000')
     await supabase.from('subjects').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('admission_students').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('admission_batches').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('board_exams').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('online_admissions').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('notices').delete().neq('id', '00000000-0000-0000-0000-000000000000')
 
     // 2. Restore in order of dependencies
     if (data.subjects?.length) await supabase.from('subjects').insert(data.subjects)
@@ -901,9 +952,16 @@ export async function restoreSystemData(backup: any) {
     if (data.teacher_subjects?.length) await supabase.from('teacher_subjects').insert(data.teacher_subjects)
     if (data.pending_assignments?.length) await supabase.from('pending_assignments').insert(data.pending_assignments)
     if (data.exam_subjects?.length) await supabase.from('exam_subjects').insert(data.exam_subjects)
+    if (data.seat_plans?.length) await supabase.from('seat_plans').insert(data.seat_plans)
     if (data.results?.length) await supabase.from('results').insert(data.results)
+    
+    if (data.admission_batches?.length) await supabase.from('admission_batches').insert(data.admission_batches)
+    if (data.admission_students?.length) await supabase.from('admission_students').insert(data.admission_students)
+    if (data.board_exams?.length) await supabase.from('board_exams').insert(data.board_exams)
+    if (data.online_admissions?.length) await supabase.from('online_admissions').insert(data.online_admissions)
+    if (data.notices?.length) await supabase.from('notices').insert(data.notices)
 
-    revalidatePath('/admin/exams')
+    revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (err: any) {
     console.error('Restore Error:', err)

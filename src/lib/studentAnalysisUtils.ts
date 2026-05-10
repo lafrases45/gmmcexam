@@ -10,63 +10,74 @@ export const GENDER_OPTIONS: Gender[] = ['M', 'F'];
  */
 export const guessEthnicGroup = (fullName: any): EthnicGroup => {
   if (!fullName || typeof fullName !== 'string') return 'Other';
+  const n = fullName.toLowerCase().trim();
   
-  const trimmed = fullName.trim();
-  if (!trimmed) return 'Other';
-
-  const nameParts = trimmed.toUpperCase().split(/\s+/);
-  if (nameParts.length === 0) return 'Other';
+  const janajati = [
+    'gurung', 'magar', 'tamang', 'rai', 'limbu', 'sherpa', 'newar', 'thapa', 'pun', 'ghale', 'ale', 'rana', 'gharti', 'roka', 'budha', 'chidi', 'tharu', 'danuwar', 'majhi', 'kumal', 'darai',
+    'shrestha', 'maharjan', 'bajracharya', 'shakya', 'malla', 'joshi', 'pradhan', 'rajbhandari', 'lamichhane', 'hyoju', 'dhaubhadel', 'kayastha', 'amatya',
+    'loke', 'syangtan', 'ghising', 'yonzon', 'moktan', 'pakhrin', 'blon', 'bomjan', 'thing', 'glan', 'waiba'
+  ];
+  const dalit = ['bkr', 'bk', 'kami', 'damai', 'sarki', 'gandharba', 'pariyar', 'bishwakarma', 'sunar', 'shilpakar', 'nepali', 'dholi'];
+  const madhesi = [
+    'sah', 'yadav', 'jha', 'mandal', 'gupta', 'thakur', 'mahato', 'singh', 'mukhiya', 'mishra', 'chaudhary', 'prajapati', 'shah', 'telu', 'paswan', 'kushwaha', 'sahani', 'das', 'rauniyar', 'ansari', 'sheikh'
+  ];
+  const brahminChhetri = [
+    'sharma', 'koirala', 'adhikari', 'acharya', 'bhattarai', 'poudel', 'pant', 'pokhrel', 'pandey', 'subedi', 'regmi', 'bastola', 'dahal', 'ghimire', 'neupane', 'sapkota', 'timilsina', 'upadhyaya', 'rimal',
+    'karki', 'khadka', 'basnet', 'kc', 'chhetri', 'rawat', 'bista', 'kunwar', 'budhathoki', 'rokaya', 'khatri', 'bohara', 'hamal', 'baun', 'chettri'
+  ];
+  const edj = ["chamar", "lama"]; // Example additions for EDJ if needed
   
-  const surname = nameParts[nameParts.length - 1];
-  const lastTwo = nameParts.length >= 2 ? `${nameParts[nameParts.length - 2]} ${nameParts[nameParts.length - 1]}` : "";
+  const words = n.split(/\s+/);
   
-  const normalizedSurname = surname.replace(/\./g, "").trim();
-  const normalizedLastTwo = lastTwo.replace(/\./g, "").replace(/\s+/g, "").trim();
-
-  const categories: Record<EthnicGroup, string[]> = {
-    "EDJ": ["TAMANG", "CHAMAR", "LAMA"],
-    "Janajati": ["GURUNG", "MAGAR", "RAI", "LIMBU", "SHERPA", "NEWAR", "SHRESTHA", "MAHARJAN", "SHAKYA", "BAJRACHARYA", "THAKALI", "THARU", "GHARTI", "PUN", "BHUJEL", "ALE"],
-    "Dalit": ["BK", "PARIYAR", "NEPALI", "SUNAR", "KAMI", "DAMAI", "SARKI", "GAHATRAJ", "DARJI", "BISHWAKARMA"],
-    "Madeshi": ["YADAV", "SAH", "MAHATO", "THAKUR", "PANDIT", "JHA", "MISHRA", "SINGH", "GUPTA", "DAS", "MANDAL", "KUMAR"],
-    "Other": [
-      "THAPA", "PAUDEL", "POUDEL", "ADHIKARI", "ARYAL", "BASTOLA", "BHANDARI", "BHATTA", "BHATTARAI", "DAHAL", "DEVKOȚA", "GAUTAM", "GHIMIRE", "JOSHI", "KOIRALA", "LAMSAL", "NEUPANE", "PANT", "POKHREL", "POKHAREL", "REGMI", "RIJAL", "SHARMA", "SUBEDI", "TIWARI", "UPADHYAYA", "WAGLE",
-      "KC", "BASNET", "BISTA", "BOHARA", "CHAND", "CHHETRI", "HAMAL", "KARKI", "KHATRI", "KHADKA", "KUNWAR", "MAHAT", "RANA", "RAWAL", "ROKAYA", "SHAH", "SHAHI", "THAKURI"
-    ]
-  };
-
-  for (const group of (Object.keys(categories) as EthnicGroup[])) {
-    if (categories[group].includes(normalizedSurname) || categories[group].includes(normalizedLastTwo)) {
-      return group;
-    }
-  }
+  if (words.some(w => janajati.includes(w))) return 'Janajati';
+  if (words.some(w => dalit.includes(w))) return 'Dalit';
+  // Note: Madeshi is spelled Madeshi in ETHNIC_OPTIONS here
+  if (words.some(w => madhesi.includes(w))) return 'Madeshi';
+  if (words.some(w => edj.includes(w))) return 'EDJ';
+  if (words.some(w => brahminChhetri.includes(w))) return 'Other';
   
-  return "Other";
+  return 'Other';
 };
 
-/**
- * Guesses gender based on common Nepali names and indicators.
- */
 export const guessGender = (fullName: any): Gender => {
   if (!fullName || typeof fullName !== 'string') return 'M';
+  const n = fullName.toLowerCase().trim();
   
-  const trimmed = fullName.trim();
-  if (!trimmed) return 'M';
-
-  const nameParts = trimmed.toUpperCase().split(/\s+/);
-  if (nameParts.length === 0) return 'M';
+  const femaleSuffixes = ['devi', 'maya', 'kumari', 'shanti', 'laxmi', 'saraswati', 'kala', 'sheela', 'tara'];
+  const unicodeFemaleSuffixes = ['कुमारी', 'देवी', 'माया', 'शान्ति', 'लक्ष्मी', 'सरस्वती', 'कला', 'शीला', 'तारा'];
   
-  const firstName = nameParts[0];
-  const femaleIndicators = [
-    "KUMARI", "DEVI", "MAYA", "LALITA", "SITA", "GITA", "RITA", "ANITA", "SUNITA", 
-    "BINITA", "PRATIKSHYA", "SUSHMA", "POOJA", "REKHA", "AKRITI", "SONY", "SONI", 
-    "ANJALI", "ANU", "SABINA", "BINA", "ALINA", "ALISHA", "ANISHA", "AAYUSHA", "AASHIKA", "ASMITA", "BISHNU", "DIKSHYA", "MONIKA"
+  const femaleFirstNames = [
+    'shristi', 'sristi', 'aanisha', 'anisha', 'anita', 'anjali', 'anjila', 'anjy', 'anju', 'archana', 'asmita', 'asika', 'asha', 'akriti', 'aarati', 'arati',
+    'bandana', 'binita', 'bimala', 'bina', 'bishnu', 'bhagwati', 'bhumika', 'bhawana',
+    'chanda', 'chandrika', 'charu',
+    'deepa', 'deepti', 'dikshya', 'dipa', 'dolma', 'durga',
+    'elina', 'eleena', 'esha',
+    'geeta', 'gita', 'goma', 'gauri', 'ganga',
+    'hira', 'huma', 'hema',
+    'indira', 'isha', 'ishwari', 'indu',
+    'janaki', 'jamuna', 'jyoti', 'junu', 'jina',
+    'kabita', 'kalpana', 'kamala', 'karuna', 'karishma', 'kiran', 'kriti', 'kusum', 'kunti',
+    'laxmi', 'lila', 'lalita', 'lucky',
+    'manisha', 'manju', 'maya', 'meena', 'mina', 'muna', 'mamata', 'monika', 'mira',
+    'nabina', 'namrata', 'neeta', 'nitu', 'nirmala', 'niruta', 'nisha', 'neha',
+    'ojashwi', 'omshanti',
+    'pabitra', 'parbati', 'pooja', 'puja', 'pratima', 'prativa', 'purnima', 'puspa', 'pushpa', 'preeti', 'priti', 'priyanka', 'pema',
+    'rabina', 'rachana', 'rita', 'reema', 'rima', 'rekha', 'roshni', 'roshani', 'rupa', 'radha', 'radhika', 'rashmi', 'ranjana', 'renu', 'renuka',
+    'sabina', 'sabitra', 'sadhana', 'samjhana', 'sandhya', 'sangita', 'sangeeta', 'sapana', 'sarita', 'saraswati', 'shanti', 'sharmila', 'shova', 'shobha', 'sita', 'sneha', 'soniya', 'sonia', 'sudha', 'sujata', 'sumitra', 'sunita', 'sushila', 'sushma', 'swechha', 'sweta',
+    'tara', 'tulasa', 'tika',
+    'uma', 'urmila', 'ushma', 'usha',
+    'varsha', 'barsha', 'vimala', 'vidya',
+    'yamuna', 'yashoda'
   ];
-  
-  if (femaleIndicators.some(ind => firstName === ind || trimmed.toUpperCase().includes(" " + ind))) return "F";
-  if (firstName.endsWith("I")) return "F";
-  
-  const maleANames = ["SUMAN", "ROSAN", "ROSHAN", "ROHAN", "JEEVAN", "KIRAN", "SURYA", "KRISHNA", "RAMA", "BISHAL"];
-  if (firstName.endsWith("A") && !maleANames.includes(firstName)) return "F";
 
-  return "M";
+  const words = n.split(/\s+/);
+  
+  if (words.some(w => femaleFirstNames.includes(w))) return 'F';
+  if (femaleSuffixes.some(s => n.endsWith(s))) return 'F';
+  if (unicodeFemaleSuffixes.some(s => n.endsWith(s))) return 'F';
+  
+  const legacyFemaleKeywords = ['sharmila', 'dikshya', 'rachana', 'sadhana', 'tulasa', 'yamuna'];
+  if (legacyFemaleKeywords.some(k => n.includes(k))) return 'F';
+
+  return 'M';
 };

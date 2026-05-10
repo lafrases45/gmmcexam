@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import styles from '@/app/admin/exams/exams.module.css'
+import styles from '@/app/admin/internal-exams/exams.module.css'
 import { 
   createExam, updateExam, getExamSubjects, deleteExam, 
   addSubject, updateSubject, deleteSubject, bulkAddTeachers, 
@@ -11,8 +11,10 @@ import {
   syncTeacherAssignments, updateTeacher, deleteTeacher, getMissingMarksReport,
   saveRoutine, getExamRoutine,
   updateExamBasicInfo, saveExamSubjectsOnly,
-  createExamBatch, getExamsByGroup, getTeacherDashboardData, getLedgerData
+  createExamBatch, getExamsByGroup, getTeacherDashboardData, getLedgerData,
+  getExamSubjectsBatch, getExamRoutineBatch
 } from '@/lib/actions/exam-actions'
+import { toast } from '@/lib/store/useToastStore'
 import { 
   ClipboardList, Users, BookOpen, Trash2, Edit2, 
   Plus, Save, ArrowLeft, CheckCircle, Search, 
@@ -38,12 +40,12 @@ export default function AdminPanel({
   profiles?: any[]
 }) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'exams' | 'subjects' | 'teachers' | 'ledger' | 'report'>('exams')
+  const [activeTab, setActiveTab] = useState<'exams' | 'subjects' | 'teachers'>('exams')
   const [exams, setExams] = useState(initialExams)
   const [results, setResults] = useState([])
   const [ledger, setLedger] = useState(initialLedger)
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const itemsPerPage = 6
   // wizardStep: 0=list, 1=basic info, 2=subjects, 3=routine, 4=exam dashboard
   const [wizardStep, setWizardStep] = useState(0)
   const [editingExam, setEditingExam] = useState<any>(null)
@@ -56,6 +58,21 @@ export default function AdminPanel({
   const [isSavingSubjects, setIsSavingSubjects] = useState(false);
   const [isSavingBasic, setIsSavingBasic] = useState(false);
   const [isSavingAssignments, setIsSavingAssignments] = useState(false);
+
+  const groupedExamsList = React.useMemo(() => {
+    const grouped: any[] = [];
+    const seenGroups = new Set();
+    exams.forEach(ex => {
+      if (!ex.group_id) {
+        grouped.push(ex);
+      } else if (!seenGroups.has(ex.group_id)) {
+        seenGroups.add(ex.group_id);
+        const groupPrograms = exams.filter(e => e.group_id === ex.group_id).map(e => e.program)
+        grouped.push({ ...ex, is_group: true, combined_programs: Array.from(new Set(groupPrograms)).join(', ') });
+      }
+    });
+    return grouped;
+  }, [exams]);
   
   // New state for bulk subject management
   const [subjectSettings, setSubjectSettings] = useState<Record<string, { selected: boolean, fm: number, pm: number }>>({});
@@ -183,7 +200,7 @@ export default function AdminPanel({
 
   const handleAutoFill = (startSubjectId: string, startDate: string) => {
     if (!startDate || !startDate.includes('/')) {
-      alert('Please enter a valid date (e.g. 2081/01/15) first.');
+      toast.warning('Please enter a valid date (e.g. 2081/01/15) first.');
       return;
     }
     
@@ -329,49 +346,41 @@ export default function AdminPanel({
     setRoutineInputs(newInputs);
   };
 
-  const loadExamData = async (exam: any) => {
-    let allMarks: any[] = []
-    if (exam.group_id) {
-      const g = await getExamsByGroup(exam.group_id)
-      for (const ex of g) {
-        const m = await getExamSubjects(ex.id)
-        allMarks = [...allMarks, ...m]
-      }
-    } else {
-      allMarks = await getExamSubjects(exam.id)
-    }
-    setExistingMarks(allMarks)
+  const loadExamData = async (exam: any, preloadedGroupExams?: any[]) => {
+    // 1. Fetch group exams first if not already known
+    const g = preloadedGroupExams 
+      ? preloadedGroupExams 
+      : (exam.group_id ? await getExamsByGroup(exam.group_id) : [exam]);
     
-    // For routine, same logic
-    let allRoutine: any[] = []
-    if (exam.group_id) {
-      const g = await getExamsByGroup(exam.group_id)
-      for (const ex of g) {
-        const r = await getExamRoutine(ex.id)
-        allRoutine = [...allRoutine, ...r]
-      }
-    } else {
-      allRoutine = await getExamRoutine(exam.id)
-    }
-    setRoutineData(allRoutine)
+    const examIds = g.map(ex => ex.id);
     
-    const inputs: Record<string, string> = {}
-    allMarks.forEach((m: any) => { inputs[m.subject_id] = m.exam_date || '' })
-    setRoutineInputs(inputs)
+    // 2. Fetch everything else in parallel using batch fetchers
+    const [allMarks, allRoutine, rep] = await Promise.all([
+      getExamSubjectsBatch(examIds),
+      getExamRoutineBatch(examIds),
+      getMissingMarksReport(exam.id)
+    ]);
 
-    // Populate subject settings
-    const settings: Record<string, { selected: boolean, fm: number, pm: number }> = {}
+    // 3. Process data and update state
+    setExistingMarks(allMarks);
+    setRoutineData(allRoutine);
+    setMissingReport(rep);
+
+    const inputs: Record<string, string> = {};
+    const settings: Record<string, { selected: boolean, fm: number, pm: number }> = {};
+    
     allMarks.forEach((m: any) => {
+      inputs[m.subject_id] = m.exam_date || '';
       settings[`${m.exam_id}_${m.subject_id}`] = {
-        selected: true, // If it exists in exam_subjects, it's selected
+        selected: true,
         fm: m.full_marks || 100,
         pm: m.pass_marks || 40
-      }
-    })
-    setSubjectSettings(settings)
-
-    const rep = await getMissingMarksReport(exam.id)
-    setMissingReport(rep)
+      };
+    });
+    
+    setRoutineInputs(inputs);
+    setSubjectSettings(settings);
+    return g; // Return group exams for caller to use
   }
 
   const handleEditClick = async (exam: any) => {
@@ -383,15 +392,12 @@ export default function AdminPanel({
     setExamName(exam.name || '')
     setExamTime(exam.exam_time || '')
     setExamGroupId(exam.group_id || null)
-    if (exam.group_id) {
-      const g = await getExamsByGroup(exam.group_id)
-      setGroupExams(g)
-      setProgramRows(g.map(ex => ({ program: ex.program, yearOrSem: ex.year_or_semester })))
-    } else {
-      setGroupExams([exam])
-      setProgramRows([{ program: exam.program, yearOrSem: exam.year_or_semester }])
-    }
-    await loadExamData(exam)
+    
+    // Load data and get the group exams back
+    const g = await loadExamData(exam)
+    
+    setGroupExams(g)
+    setProgramRows(g.map(ex => ({ program: ex.program, yearOrSem: ex.year_or_semester })))
     setWizardStep(4)
   }
 
@@ -425,9 +431,9 @@ export default function AdminPanel({
         } else {
           await deleteExam(examId)
         }
-        alert('Deleted successfully.')
+        toast.success('Deleted successfully.')
       } catch (error: any) {
-        alert(`Failed to delete: ${error.message}`)
+        toast.error(`Failed to delete: ${error.message}`)
       }
     }
   }
@@ -488,7 +494,7 @@ export default function AdminPanel({
       resetSubjectForm()
       router.refresh()
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message || 'Failed to add/update subject')
     }
   }
 
@@ -534,7 +540,7 @@ export default function AdminPanel({
       setNotificationModal({ show: true, type: 'success', message: 'Subject deleted successfully!' })
       setConfirmDeleteModal({ show: false, id: null, title: '' })
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message || 'Failed to delete subject')
     }
   }
 
@@ -545,11 +551,11 @@ export default function AdminPanel({
     const prog = formData.get('program') as string
     try {
       await bulkAddTeachers(text, prog)
-      alert('Teachers added to registry!')
+      toast.success('Teachers added to registry!')
       setIsBulkAdding(false)
       loadTeacherData()
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message || 'Failed to bulk add teachers')
     }
   }
 
@@ -580,9 +586,9 @@ export default function AdminPanel({
     try {
       await syncTeacherAssignments(selectedTeacher.email, tempAssignments, selectedTeacher.id)
       setTeacherAssignments(tempAssignments)
-      alert('Assignments saved!')
+      toast.success('Assignments saved!')
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message || 'Failed to save assignments')
     } finally {
       setIsSavingAssignments(false)
     }
@@ -596,11 +602,11 @@ export default function AdminPanel({
     
     try {
       await updateTeacher(editingTeacher.email, { full_name: newName, email: newEmail }, editingTeacher.id)
-      alert('Teacher updated!')
+      toast.success('Teacher updated successfully!')
       setEditingTeacher(null)
       loadTeacherData()
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message || 'Failed to update teacher')
     }
   }
 
@@ -608,11 +614,11 @@ export default function AdminPanel({
     if (window.confirm(`Are you sure you want to remove this teacher? This will also delete their subject assignments.`)) {
       try {
         await deleteTeacher(email, id)
-        alert('Teacher removed successfully')
+        toast.success('Teacher removed successfully')
         loadTeacherData()
         setSelectedTeacher(null)
       } catch (err: any) {
-        alert(err.message)
+        toast.error(err.message || 'Failed to delete teacher')
       }
     }
   }
@@ -639,19 +645,19 @@ export default function AdminPanel({
     const result = fd.get('result_date') as string
 
     if (!start.includes('/') || !end.includes('/') || !result.includes('/')) {
-      alert("Error: Please use YYYY/MM/DD format for B.S. dates.")
+      toast.error("Error: Please use YYYY/MM/DD format for B.S. dates.")
       setIsSavingBasic(false)
       return
     }
 
     if (end < start) {
-      alert("Error: Exam End Date cannot be before the Start Date.")
+      toast.error("Error: Exam End Date cannot be before the Start Date.")
       setIsSavingBasic(false)
       return
     }
 
     if (result <= end) {
-      alert("Error: Result Publication Date must be strictly AFTER the Exam End Date.")
+      toast.error("Error: Result Publication Date must be strictly AFTER the Exam End Date.")
       setIsSavingBasic(false)
       return
     }
@@ -716,8 +722,9 @@ export default function AdminPanel({
         setSubjectSettings(newSettings)
       }
       setWizardStep(2)
+      toast.success('Basic info saved')
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message || 'Failed to save basic info')
     } finally {
       setIsSavingBasic(false)
     }
@@ -755,8 +762,9 @@ export default function AdminPanel({
       
       await loadExamData(editingExam)
       setWizardStep(3)
+      toast.success('Exam subjects saved')
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message || 'Failed to save subjects')
     } finally {
       setIsSavingSubjects(false)
     }
@@ -784,18 +792,6 @@ export default function AdminPanel({
         >
           <BookOpen size={18} /> Subjects
         </button>
-        <button 
-          className={`${styles.tabBtn} ${activeTab === 'ledger' ? styles.active : ''}`}
-          onClick={() => setActiveTab('ledger')}
-        >
-          <FileText size={18} /> Ledger
-        </button>
-        <button 
-          className={`${styles.tabBtn} ${activeTab === 'report' ? styles.active : ''}`}
-          onClick={() => setActiveTab('report')}
-        >
-          <BarChart3 size={18} /> Reports
-        </button>
       </div>
 
       {activeTab === 'exams' && (
@@ -806,7 +802,7 @@ export default function AdminPanel({
           {/* ── STEP 0: Exam List */}
           {wizardStep === 0 && (
           <div>
-            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ textAlign: 'center', margin: '3rem 0 4rem 0' }}>
               <button
                 onClick={() => { 
                   setEditingExam(null); 
@@ -820,87 +816,113 @@ export default function AdminPanel({
                   setGroupExams([]);
                   setWizardStep(1); 
                 }}
-                className={`${styles.button} ${styles.buttonPrimary}`}
-                style={{ padding: '1.25rem 3rem', fontSize: '1.25rem', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0, 50, 146, 0.3)' }}
+                className={styles.operateBtn}
               >
-                <span>➕</span> Operate New Exam
+                <Plus size={28} /> Operate New Exam
               </button>
             </div>
-            <div className={styles.card}>
-              <h3>Exams</h3>
-              <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {(() => {
-                  const grouped: any[] = [];
-                  const seenGroups = new Set();
-                  exams.forEach(ex => {
-                    if (!ex.group_id) {
-                      grouped.push(ex);
-                    } else if (!seenGroups.has(ex.group_id)) {
-                      seenGroups.add(ex.group_id);
-                      const groupPrograms = exams.filter(e => e.group_id === ex.group_id).map(e => e.program)
-                      grouped.push({ ...ex, is_group: true, combined_programs: Array.from(new Set(groupPrograms)).join(', ') });
-                    }
-                  });
 
-                  const totalPages = Math.ceil(grouped.length / itemsPerPage);
+            <div className={styles.card} style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
+                <ClipboardList size={22} color="#1e40af" />
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Exams</h3>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {(() => {
+                  const totalPages = Math.ceil(groupedExamsList.length / itemsPerPage);
                   const startIndex = (currentPage - 1) * itemsPerPage;
-                  const paginated = grouped.slice(startIndex, startIndex + itemsPerPage);
+                  const paginated = groupedExamsList.slice(startIndex, startIndex + itemsPerPage);
+
+                  if (groupedExamsList.length === 0) {
+                    return (
+                      <div style={{ padding: '5rem 2rem', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', border: '2px dashed #e2e8f0' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1.5rem', opacity: 0.5 }}>📝</div>
+                        <p style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>No exams yet.</p>
+                        <p style={{ fontSize: '0.9rem', marginTop: '0.5rem', opacity: 0.8 }}>Click <strong>+ Operate New Exam</strong> to get started.</p>
+                      </div>
+                    )
+                  }
 
                   return (
                     <React.Fragment>
                       {paginated.map(exam => (
-                        <div key={exam.id} style={{ border: '1px solid #e5e7eb', padding: '1rem 1.25rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-                          <div>
-                            <p style={{ fontWeight: 700, color: '#111827', marginBottom: '0.25rem' }}>{exam.name}</p>
-                            <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
-                              {exam.is_group ? `Programs: ${exam.combined_programs}` : `${exam.program} — ${exam.year_or_semester}`} 
-                              &nbsp;|&nbsp; Ends: {new Date(exam.end_date).toLocaleDateString()}
-                            </p>
+                        <div key={exam.id} style={{ 
+                          border: '1px solid #f1f5f9', 
+                          padding: '1.25rem 1.5rem', 
+                          borderRadius: '14px', 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center', 
+                          gap: '1.5rem',
+                          background: '#fff',
+                          transition: 'all 0.2s ease',
+                        }}
+                        className={styles.hoverCard}
+                        >
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.05rem', marginBottom: '0.4rem' }}>{exam.name}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                <Layout size={14} /> {exam.is_group ? exam.combined_programs : `${exam.program} — ${exam.year_or_semester}`}
+                              </span>
+                              <span style={{ color: '#cbd5e1' }}>|</span>
+                              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                <Calendar size={14} /> {new Date(exam.end_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                            </div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
-                            <span className={`${styles.badge} ${styles[`badge${exam.status}`]}`}>{exam.status}</span>
+                            <span className={`${styles.badge} ${styles[`badge${exam.status}`]}`} style={{ padding: '0.4rem 0.75rem', borderRadius: '8px' }}>{exam.status}</span>
                             <button 
                               onClick={() => handleEditClick(exam)} 
-                              className={`${styles.button} ${styles.buttonPrimary}`}
-                              style={{ padding: '0.65rem 1.5rem', fontSize: '0.9rem' }}
+                              className={styles.button}
+                              style={{ padding: '0.75rem 1.75rem', fontSize: '0.9rem', background: '#eff6ff', color: '#1e40af', border: '1px solid #dbeafe', borderRadius: '10px', fontWeight: 700 }}
                             >
-                              Manage <span>→</span>
+                              Manage <ChevronRight size={16} />
                             </button>
                             <button 
                               onClick={() => handleDeleteClick(exam.id, exam.group_id)} 
-                              className={`${styles.button} ${styles.buttonSecondary}`}
-                              style={{ padding: '0.65rem', border: 'none', background: '#fee2e2', color: '#ef4444' }}
+                              style={{ 
+                                padding: '0.75rem', 
+                                border: '1px solid #fee2e2', 
+                                background: '#fef2f2', 
+                                color: '#ef4444', 
+                                borderRadius: '10px', 
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseOver={e => e.currentTarget.style.background = '#fee2e2'}
+                              onMouseOut={e => e.currentTarget.style.background = '#fef2f2'}
                             >
-                              🗑️
+                              <Trash2 size={18} />
                             </button>
                           </div>
                         </div>
                       ))}
 
                       {/* Pagination Controls */}
-                      {grouped.length > itemsPerPage && (
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem', padding: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                      {groupedExamsList.length > itemsPerPage && (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.5rem', marginTop: '2rem', padding: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
                           <button 
                             disabled={currentPage === 1}
                             onClick={() => setCurrentPage(p => p - 1)}
-                            style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}
+                            style={{ padding: '0.6rem 1.2rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1, fontWeight: 600, fontSize: '0.85rem' }}
                           >Previous</button>
-                          <span style={{ fontSize: '0.9rem', color: '#64748b' }}>Page <strong>{currentPage}</strong> of {totalPages}</span>
+                          <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 500 }}>Page <strong style={{ color: '#1e293b' }}>{currentPage}</strong> of <strong>{totalPages}</strong></span>
                           <button 
                             disabled={currentPage >= totalPages}
                             onClick={() => setCurrentPage(p => p + 1)}
-                            style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer', opacity: currentPage >= totalPages ? 0.5 : 1 }}
+                            style={{ padding: '0.6rem 1.2rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer', opacity: currentPage >= totalPages ? 0.5 : 1, fontWeight: 600, fontSize: '0.85rem' }}
                           >Next</button>
                         </div>
                       )}
                     </React.Fragment>
                   )
                 })()}
-                {exams.length === 0 && (
-                  <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: '8px' }}>
-                    No exams yet. Click <strong>+ Operate New Exam</strong> to get started.
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -1165,7 +1187,8 @@ export default function AdminPanel({
                      
                      await loadExamData(editingExam!)
                      setWizardStep(4)
-                   } catch (e: any) { alert(e.message) } finally { setIsSavingRoutine(false) }
+                     toast.success('Routine saved successfully!')
+                   } catch (e: any) { toast.error(e.message || 'Failed to save routine') } finally { setIsSavingRoutine(false) }
                  }} 
                  style={{ 
                    flex: 2, padding: '0.85rem', background: isSavingRoutine ? '#94a3b8' : '#003292', 
@@ -1203,7 +1226,8 @@ export default function AdminPanel({
                        const a = document.createElement('a'); 
                        a.href = url; a.download = examGroupId ? 'master_routine.pdf' : 'routine.pdf'; 
                        document.body.appendChild(a); a.click(); URL.revokeObjectURL(url)
-                     } catch (e: any) { alert(e.message) }
+                       toast.success('PDF generated successfully!')
+                     } catch (e: any) { toast.error(e.message || 'Failed to generate PDF') }
                    }} 
                    style={{ 
                      flex: 1, padding: '0.85rem', background: 'white', color: '#0ea5e9', 
@@ -1214,7 +1238,12 @@ export default function AdminPanel({
                  >
                    📄 {examGroupId ? 'Master Routine' : 'PDF'}
                  </button>
-               )}          {/* ── STEP 4: Exam Dashboard (Management Hub) */}
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── STEP 4: Exam Dashboard (Management Hub) */}
           {wizardStep === 4 && editingExam && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
@@ -1257,74 +1286,25 @@ export default function AdminPanel({
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <button 
-                      onClick={() => setWizardStep(5)} 
-                      style={{ padding: '1.25rem', background: 'white', border: '2px solid #003292', color: '#003292', borderRadius: '16px', fontWeight: 800, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }}
-                      onMouseOver={e => e.currentTarget.style.background = '#f8fafc'}
-                      onMouseOut={e => e.currentTarget.style.background = 'white'}
-                    >
-                      <FileText size={24} />
-                      View Full Ledger
-                    </button>
-                    <button 
-                      onClick={() => setWizardStep(6)} 
-                      style={{ padding: '1.25rem', background: 'white', border: '2px solid #003292', color: '#003292', borderRadius: '16px', fontWeight: 800, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }}
-                      onMouseOver={e => e.currentTarget.style.background = '#f8fafc'}
-                      onMouseOut={e => e.currentTarget.style.background = 'white'}
-                    >
-                      <BarChart3 size={24} />
-                      Result Reports
-                    </button>
+                  <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '0.85rem', color: '#64748b' }}>
+                    <p style={{ margin: 0 }}><strong>Setup Hub:</strong> Use the cards above to manage the exam lifecycle. Once setup is complete, teachers can enter marks via their portal.</p>
                   </div>
                 </div>
 
-                {/* Right Side: Status Summary */}
+                {/* Right Side: Quick Stats */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div style={{ 
-                    padding: '1.5rem', 
-                    border: `1px solid ${missingReport.length === 0 && ledger.some(r => r.exam_id === editingExam.id) ? '#bbf7d0' : '#fef08a'}`, 
-                    borderRadius: '16px', 
-                    background: missingReport.length === 0 && ledger.some(r => r.exam_id === editingExam.id) ? '#f0fdf4' : '#fefce8',
-                    height: '100%'
-                  }}>
-                    <h4 style={{ fontWeight: 800, color: '#1e293b', fontSize: '1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <CheckCircle size={18} /> Teacher Marks Status
-                    </h4>
-                    {missingReport.length > 0 ? (
-                      <div style={{ fontSize: '0.85rem' }}>
-                        <p style={{ color: '#dc2626', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <AlertCircle size={14} /> {missingReport.length} items incomplete
-                        </p>
-                        <div style={{ maxHeight: '350px', overflowY: 'auto', background: 'rgba(255,255,255,0.7)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
-                          <ul style={{ paddingLeft: '0', margin: '0', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {missingReport.map((m, i) => (
-                              <li key={i} style={{ paddingBottom: '0.75rem', borderBottom: i < missingReport.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' }}>{m.subject_name}</div>
-                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>{m.program} — {m.year}</div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.4rem' }}>
-                                  <span style={{ color: m.status === 'Sync Needed' ? '#f59e0b' : '#dc2626', fontWeight: 800, background: m.status === 'Sync Needed' ? '#fffbeb' : '#fef2f2', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>{m.status}</span>
-                                  <span style={{ color: '#475569', fontStyle: 'italic' }}>{m.teacher_names}</span>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ) : (
-                      <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
-                        <p style={{ fontSize: '0.95rem', color: '#16a34a', fontWeight: 700 }}>All marks are submitted!</p>
-                        <p style={{ fontSize: '0.8rem', color: '#16a34a', opacity: 0.8 }}>You can now publish the results.</p>
-                      </div>
-                    )}
-                    
-                    <button
-                      onClick={() => { if (missingReport.length > 0) { alert('Cannot publish! Please ensure all teachers have submitted marks.') } else { alert('Bulk Publish feature coming soon!') } }}
-                      style={{ width: '100%', marginTop: '1.5rem', padding: '1rem', background: missingReport.length > 0 ? '#cbd5e1' : '#16a34a', color: 'white', borderRadius: '12px', border: 'none', cursor: missingReport.length > 0 ? 'not-allowed' : 'pointer', fontWeight: 800, fontSize: '1rem', boxShadow: missingReport.length > 0 ? 'none' : '0 10px 15px -3px rgba(22, 163, 74, 0.3)' }}
-                    >
-                      {missingReport.length > 0 ? `🔒 Publish Locked (${missingReport.length} missing)` : '🚀 Publish Exam Results'}
-                    </button>
+                  <div className={styles.card} style={{ margin: 0, padding: '1.5rem', background: '#f0f9ff', border: '1px solid #bae6fd' }}>
+                    <h4 style={{ color: '#0369a1', marginBottom: '1rem' }}>Exam Summary</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                       <div>
+                         <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Total Subjects</span>
+                         <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0369a1' }}>{existingMarks.length}</div>
+                       </div>
+                       <div>
+                         <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Exam Date</span>
+                         <div style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b' }}>{editingExam.start_date || 'Not set'}</div>
+                       </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1958,13 +1938,6 @@ export default function AdminPanel({
         </div>
       )}
 
-      {activeTab === 'ledger' && (
-        <LedgerManager exams={exams} />
-      )}
-
-      {activeTab === 'report' && (
-        <ResultReports exams={exams} />
-      )}
     </div>
   )
 }

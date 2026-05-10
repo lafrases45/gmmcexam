@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useBoardExamStore, EthnicGroup } from '@/lib/boardExamStore';
 import * as XLSX from 'xlsx';
 import { createClient } from '@/lib/supabase/client';
+import { toast } from '@/lib/store/useToastStore';
 
 const ETHNIC_OPTIONS: EthnicGroup[] = ["Janajati", "Madeshi", "Dalits", "EDJ", "Others"];
 const GENDER_OPTIONS = ["M", "F", "Other"];
@@ -215,7 +216,7 @@ function VerifyContent() {
         });
 
         setError('');
-        alert(`Finished processing. Updated ${updateCount} student records based on Excel rows.`);
+        toast.success(`Finished processing. Updated ${updateCount} student records based on Excel rows.`);
       } catch (err: any) {
         setError(`Error parsing Excel: ${err.message}`);
       }

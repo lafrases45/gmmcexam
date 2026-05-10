@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { toast } from '@/lib/store/useToastStore';
 import styles from './login.module.css';
 
 export default function AdminLogin() {
@@ -23,13 +24,14 @@ export default function AdminLogin() {
       });
 
       if (error) {
-        alert("Login Error: " + error.message);
+        toast.error("Login Error: " + error.message);
       } else {
         console.log("Login successful, redirecting...");
+        toast.success("Welcome back!");
         router.push('/admin');
       }
     } catch (err: any) {
-      alert('Unexpected Error: ' + (err.message || 'Check your internet connection'));
+      toast.error('Unexpected Error: ' + (err.message || 'Check your internet connection'));
     } finally {
       setLoading(false);
     }

@@ -11,7 +11,7 @@ export default function Home() {
   const activeModules = [
     { title: 'Admin Panel', description: 'Core system administration and oversight', icon: <UserCog size={20} />, path: '/admin', color: '#1e40af' },
     { title: 'Teacher Portal', description: 'Marks entry and subject management', icon: <Users size={20} />, path: '/teacher/login', color: '#0369a1' },
-    { title: 'Internal Exam', description: 'Internal assessment and routine setup', icon: <ScrollText size={20} />, path: '/admin/exams', color: '#4338ca' },
+    { title: 'Internal Exam', description: 'Internal assessment and routine setup', icon: <ScrollText size={20} />, path: '/admin/internal-exams', color: '#4338ca' },
     { title: 'Board Exam', description: 'TU marksheet extraction and verification', icon: <ClipboardCheck size={20} />, path: '/admin/board-exams', color: '#0f766e' },
     { title: 'Seat Plan', description: 'Automated seating and room allocation', icon: <LayoutGrid size={20} />, path: '/admin/seat-plan', color: '#b91c1c' },
   ];
