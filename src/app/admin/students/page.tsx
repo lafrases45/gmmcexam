@@ -377,6 +377,14 @@ export default function StudentRegistry() {
     }
   }
 
+  const toggleStudent = (id: string) => {
+    const next = new Set(selectedStudentIds)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setSelectedStudentIds(next)
+  }
+
+
   const handleDeleteStudent = async (studentId: string, studentName: string) => {
     if (window.confirm(`Mark ${studentName} as Drop-out and delete from current list?`)) {
       try {
