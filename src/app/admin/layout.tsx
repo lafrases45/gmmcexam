@@ -11,7 +11,7 @@ import {
   Users, UserPlus, GraduationCap, Settings, 
   ShieldCheck, Database, Search, Bell, Menu, 
   ChevronLeft, LogOut, FileText, UserCheck, 
-  Settings2, Activity, Layout
+  Settings2, Activity, Layout, X
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -25,6 +25,12 @@ export default function AdminLayout({
   const { session, loading } = useAuth();
   usePrefetchData();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
 
   const isLoginPage = pathname === '/admin/login';
 
@@ -89,18 +95,27 @@ export default function AdminLayout({
 
   return (
     <div className={`${styles.adminLayout} ${isCollapsed ? styles.collapsed : ''}`}>
+      {/* Mobile Overlay */}
+      <div 
+        className={`${styles.sidebarOverlay} ${isMobileOpen ? styles.mobileOpen : ''}`} 
+        onClick={() => setIsMobileOpen(false)}
+      />
+
       {/* Sidebar */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${isMobileOpen ? styles.mobileOpen : ''}`}>
         <div className={styles.sidebarLogo}>
           <div style={{ background: '#3b82f6', padding: '0.5rem', borderRadius: '10px' }}>
             <Database size={24} color="white" />
           </div>
           {!isCollapsed && (
-            <div>
+            <div style={{ flex: 1 }}>
               <h2>EMIS</h2>
               <p>Education Management</p>
             </div>
           )}
+          <button className={styles.mobileCloseBtn} onClick={() => setIsMobileOpen(false)}>
+            <X size={24} />
+          </button>
         </div>
 
         <nav className={styles.sidebarNav}>
@@ -137,17 +152,13 @@ export default function AdminLayout({
       {/* Content Area */}
       <div className={styles.contentContainer}>
         <header className={styles.header}>
-          <div className={styles.headerSearch}>
-            <Search size={18} color="#94a3b8" />
-            <input type="text" placeholder="Search students, teachers, exams..." />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button className={styles.mobileMenuBtn} onClick={() => setIsMobileOpen(true)}>
+              <Menu size={24} />
+            </button>
           </div>
 
           <div className={styles.headerActions}>
-            <div className={styles.notificationIcon}>
-              <Bell size={20} />
-              <span className={styles.notificationBadge}>5</span>
-            </div>
-            
             <div className={styles.userProfile}>
               <div className={styles.avatar}>
                 <Users size={20} color="#64748b" />

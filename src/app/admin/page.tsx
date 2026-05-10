@@ -28,7 +28,7 @@ export default function AdminDashboard() {
 
   const PROGRAM_GROUPS = [
     { id: 'bbs',      label: 'BBS',       prefixes: ['BBS'],         color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
-    { id: 'bed',      label: 'B.Ed.',     prefixes: ['B.ED', 'BED'], color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0' },
+    { id: 'bed',      label: 'B.Ed.',     prefixes: ['B.ED.', 'B.ED', 'BED'], color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0' },
     { id: 'bhm',      label: 'BHM',       prefixes: ['BHM'],         color: '#f59e0b', bg: '#fffbeb', border: '#fde68a' },
     { id: 'bim-bitm', label: 'BIM/BITM',  prefixes: ['BITM', 'BIM'], color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe' },
     { id: 'mbs',      label: 'MBS',       prefixes: ['MBS'],         color: '#ec4899', bg: '#fdf2f8', border: '#fbcfe8' },

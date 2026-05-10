@@ -461,9 +461,9 @@ export default function StudentRegistry() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '4rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.5rem 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ flex: '1 1 300px' }}>
+          <h1 style={{ fontSize: 'clamp(1.4rem, 5vw, 1.75rem)', fontWeight: 800, margin: '0 0 0.5rem 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             <Users size={32} color="#3b82f6" /> Admissions Registry
           </h1>
           <p style={{ margin: 0, color: '#64748b' }}>Manage student batches, demographics, and academic upgrades.</p>
@@ -862,8 +862,8 @@ export default function StudentRegistry() {
             </div>
           )}
 
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
+            <table style={{ width: '100%', minWidth: '700px', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                   <th style={{ padding: '1rem', fontWeight: 600, color: '#475569', fontSize: '0.85rem' }}>Batch Name</th>
@@ -1054,21 +1054,21 @@ export default function StudentRegistry() {
           {/* Selection Table */}
           {sourceStudents.length > 0 && (
             <div className="animate-in slide-in-from-bottom-4 duration-500" style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', background: '#f8fafc' }}>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Student Selection</h3>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
                     {selectedStudentIds.size} students will be upgraded to <strong>{newBatchName}</strong>
                   </p>
                 </div>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', flex: '1 1 200px' }}>
                   <Search style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={16} />
                   <input 
                     type="text" 
                     placeholder="Search students..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '10px', border: '1px solid #e2e8f0', width: '250px', outline: 'none', fontSize: '0.85rem' }}
+                    style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '10px', border: '1px solid #e2e8f0', width: '100%', outline: 'none', fontSize: '0.85rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>

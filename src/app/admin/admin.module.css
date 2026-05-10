@@ -243,10 +243,65 @@
     grid-template-columns: 1fr;
   }
   .sidebar {
-    display: none;
+    position: fixed;
+    left: -100%;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    display: flex;
+  }
+  .sidebar.mobileOpen {
+    left: 0;
   }
   .headerSearch {
     display: none;
+  }
+}
+
+.mobileMenuBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: #1e293b;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .mobileMenuBtn {
+    display: block;
+  }
+}
+
+.sidebarOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.sidebarOverlay.mobileOpen {
+  display: block;
+}
+
+.mobileCloseBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: #a3b1c6;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .mobileCloseBtn {
+    display: block;
   }
 }
 
