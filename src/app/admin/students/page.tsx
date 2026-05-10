@@ -76,9 +76,17 @@ export default function StudentRegistry() {
   const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester']
   const SECTIONS = ['A', 'B']
 
-  const batchName = `${selectedProg} ${selectedYear} ${selectedAcadYear} ${selectedSec}`
+  // B.Ed. helpers — defined before batchName which depends on isBEd
+  const isBEd = selectedProg === 'B.Ed.' || selectedProg.toUpperCase().startsWith('B.ED')
+  const sectionMajor = (sec: string) => sec === 'A' ? 'English' : 'Nepali'
 
-  const [tsvData, setTsvData] = useState('')
+  // For B.Ed., batch is shared between sections — no section letter in name
+  const batchName = isBEd
+    ? `${selectedProg} ${selectedYear} ${selectedAcadYear}`
+    : `${selectedProg} ${selectedYear} ${selectedAcadYear} ${selectedSec}`
+
+  const [tsvData, setTsvData] = useState('')   // Section A (or all for non-B.Ed.)
+  const [tsvDataB, setTsvDataB] = useState('') // Section B (B.Ed. only)
   const [isUploading, setIsUploading] = useState(false)
   const [reviewData, setReviewData] = useState<any[]>([])
   const [isReviewing, setIsReviewing] = useState(false)
@@ -101,7 +109,10 @@ export default function StudentRegistry() {
     }
   }
 
+  // (isBEd and sectionMajor are defined earlier, above batchName)
+
   const processInput = (rawRows: any[]) => {
+    const autoMajor = isBEd ? sectionMajor(selectedSec) : ''
     const processed = rawRows.map(row => {
       const uppercaseName = row.name.toUpperCase().trim()
       const nameKey = uppercaseName.toLowerCase()
@@ -112,14 +123,53 @@ export default function StudentRegistry() {
         name: uppercaseName,
         // Manual input overrides learned knowledge, which overrides AI guess
         gender: row.gender || learned?.gender || guessGender(uppercaseName),
-        ethnic_group: row.ethnic_group || learned?.ethnic_group || guessEthnicGroup(uppercaseName)
+        ethnic_group: row.ethnic_group || learned?.ethnic_group || guessEthnicGroup(uppercaseName),
+        major: row.major || autoMajor
       }
     })
-    
-    // Automatically sort by Roll No numerically/alphanumerically
-    processed.sort((a, b) => String(a.roll_no || '').localeCompare(String(b.roll_no || ''), undefined, { numeric: true }))
 
-    setReviewData(processed)
+    // --- Deduplication: remove duplicate roll_no and duplicate names ---
+    const seenRollNos = new Set<string>()
+    const seenNames = new Set<string>()
+    const duplicatesRemoved: string[] = []
+
+    const deduplicated = processed.filter(row => {
+      const rollKey = (row.roll_no || '').trim().toLowerCase()
+      const nameKey = (row.name || '').trim().toLowerCase()
+
+      // Check roll_no duplicate (only if roll_no is non-empty)
+      if (rollKey && seenRollNos.has(rollKey)) {
+        duplicatesRemoved.push(`${row.name} (Roll: ${row.roll_no})`)
+        return false
+      }
+      // Check name duplicate
+      if (nameKey && seenNames.has(nameKey)) {
+        duplicatesRemoved.push(`${row.name} (duplicate name)`)
+        return false
+      }
+
+      if (rollKey) seenRollNos.add(rollKey)
+      if (nameKey) seenNames.add(nameKey)
+      return true
+    })
+
+    if (duplicatesRemoved.length > 0) {
+      toast.warning(`Removed ${duplicatesRemoved.length} duplicate(s): ${duplicatesRemoved.slice(0, 3).join(', ')}${duplicatesRemoved.length > 3 ? ` +${duplicatesRemoved.length - 3} more` : ''}`)
+    }
+
+    // Automatically sort by Roll No numerically/alphanumerically
+    // Sort: for B.Ed. — English section first (by roll no), then Nepali section (by roll no)
+    //       For all other programs — sort by roll no only
+    deduplicated.sort((a, b) => {
+      if (isBEd) {
+        const majorOrder = (m: string) => (m === 'English' ? 0 : 1)
+        const majorDiff = majorOrder(a.major) - majorOrder(b.major)
+        if (majorDiff !== 0) return majorDiff
+      }
+      return String(a.roll_no || '').localeCompare(String(b.roll_no || ''), undefined, { numeric: true })
+    })
+
+    setReviewData(deduplicated)
     setIsReviewing(true)
   }
 
@@ -134,7 +184,8 @@ export default function StudentRegistry() {
         ethnic_group: cols[3]?.trim() || '',
         tu_regd_no: cols[4]?.trim() || '',
         batch_year: parseInt(selectedAcadYear) || null,
-        section: selectedSec || ''
+        section: selectedSec || '',
+        major: isBEd ? sectionMajor(selectedSec) : ''
       }
     }).filter(r => r.name)
     processInput(rows)
@@ -164,7 +215,8 @@ export default function StudentRegistry() {
           ethnic_group: String(row[3] || '').trim(),
           tu_regd_no: String(row[4] || '').trim(),
           batch_year: parseInt(selectedAcadYear) || null,
-          section: selectedSec || ''
+          section: selectedSec || '',
+          major: isBEd ? sectionMajor(selectedSec) : ''
         }
       }).filter(r => r && r.name && r.name !== 'undefined' && r.name !== 'null')
       
@@ -176,8 +228,8 @@ export default function StudentRegistry() {
   const handleFinalUpload = async () => {
     setIsUploading(true)
     try {
-      // 1. Save to Registry
-      await createBatch(batchName, reviewData)
+      // 1. Save to Registry — B.Ed. uses append mode (one shared batch per class)
+      await createBatch(batchName, reviewData, isBEd)
       
       // 2. Learn from this batch (deduplicate to prevent cardinality violation)
       const knowledgeMap = new Map()
@@ -215,6 +267,28 @@ export default function StudentRegistry() {
     const next = [...reviewData]
     next[index] = { ...next[index], [field]: value }
     setReviewData(next)
+  }
+
+  const deleteReviewRow = (index: number) => {
+    setReviewData(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const addReviewRow = () => {
+    setReviewData(prev => [...prev, {
+      name: '',
+      roll_no: '',
+      gender: 'Female',
+      ethnic_group: 'Other',
+      tu_regd_no: '',
+      batch_year: parseInt(selectedAcadYear) || null,
+      section: selectedSec,
+      major: isBEd ? sectionMajor(selectedSec) : ''
+    }])
+    // Scroll the table to the bottom so the new row is visible
+    setTimeout(() => {
+      const tableEl = document.getElementById('review-table-scroll')
+      if (tableEl) tableEl.scrollTop = tableEl.scrollHeight
+    }, 50)
   }
 
   const handleDeleteBatch = async (id: string, name: string) => {
@@ -438,12 +512,31 @@ export default function StudentRegistry() {
                 <div style={{ flex: 1 }}>
                   <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 700, fontSize: '0.8rem', color: '#0369a1' }}>Section</label>
                   <select value={selectedSec} onChange={e => setSelectedSec(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #7dd3fc', outline: 'none', background: 'white' }}>
-                    {SECTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                    {SECTIONS.map(s => (
+                      <option key={s} value={s}>
+                        {isBEd ? (s === 'A' ? 'A — English Major' : 'B — Nepali Major') : s}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                <div style={{ flex: 2, background: 'white', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px dashed #0369a1', height: '40px', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#64748b', marginRight: '0.5rem' }}>Resulting Batch:</span>
+                {isBEd && (
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', paddingBottom: '0.1rem' }}>
+                    <div style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: '8px', background: selectedSec === 'A' ? '#eff6ff' : '#fdf4ff', border: `1px solid ${selectedSec === 'A' ? '#93c5fd' : '#d8b4fe'}`, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{ fontSize: '1rem' }}>{selectedSec === 'A' ? '🇬🇧' : '🇳🇵'}</span>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: selectedSec === 'A' ? '#1d4ed8' : '#7c3aed' }}>
+                        {selectedSec === 'A' ? 'English Major' : 'Nepali Major'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div style={{ flex: 2, background: 'white', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px dashed #0369a1', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', minHeight: '40px' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Batch:</span>
                   <strong style={{ fontSize: '0.9rem', color: '#0c4a6e' }}>{batchName}</strong>
+                  {isBEd && (
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, background: '#fef9c3', color: '#854d0e', padding: '0.15rem 0.5rem', borderRadius: '20px', border: '1px solid #fde68a' }}>
+                      ⚡ Shared — both sections merge here
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -501,22 +594,91 @@ export default function StudentRegistry() {
                 {/* Main Action Area */}
                 <div>
                   {uploadMode === 'paste' ? (
-                    <div style={{ marginBottom: '1.5rem' }}>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>Paste Name & Roll No</label>
-                      <textarea 
-                        rows={10}
-                        placeholder="Ram Sharma	101&#10;Sita Nepal	102"
-                        value={tsvData}
-                        onChange={e => setTsvData(e.target.value)}
-                        style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #3b82f6', fontFamily: 'monospace', outline: 'none', background: 'white', fontSize: '0.85rem', resize: 'vertical' }}
-                      />
-                      <button 
-                        onClick={handlePasteInput}
-                        style={{ width: '100%', marginTop: '1rem', padding: '1rem', background: '#003292', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: '1rem' }}
-                      >
-                        Preview & Verify Data →
-                      </button>
-                    </div>
+                    isBEd ? (
+                      // B.Ed.: two side-by-side paste areas
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                          {/* Section A — English */}
+                          <div>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem', fontWeight: 700, fontSize: '0.85rem', color: '#1d4ed8' }}>
+                              <span style={{ background: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '6px', padding: '0.1rem 0.5rem', fontSize: '0.75rem' }}>Section A</span>
+                              🇬🇧 English Major
+                            </label>
+                            <textarea
+                              rows={10}
+                              placeholder={'Ram Sharma\t79-5001\nSita Nepal\t79-5002'}
+                              value={tsvData}
+                              onChange={e => setTsvData(e.target.value)}
+                              style={{ width: '100%', padding: '0.85rem', borderRadius: '10px', border: '2px solid #93c5fd', fontFamily: 'monospace', outline: 'none', background: '#f8fbff', fontSize: '0.82rem', resize: 'vertical', boxSizing: 'border-box' }}
+                            />
+                            <div style={{ fontSize: '0.7rem', color: '#3b82f6', marginTop: '0.25rem' }}>{tsvData.trim().split('\n').filter(Boolean).length} student(s) pasted</div>
+                          </div>
+
+                          {/* Section B — Nepali */}
+                          <div>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem', fontWeight: 700, fontSize: '0.85rem', color: '#7c3aed' }}>
+                              <span style={{ background: '#fdf4ff', border: '1px solid #d8b4fe', borderRadius: '6px', padding: '0.1rem 0.5rem', fontSize: '0.75rem' }}>Section B</span>
+                              🇳🇵 Nepali Major
+                            </label>
+                            <textarea
+                              rows={10}
+                              placeholder={'Hari Adhikari\t79-5020\nKamala Thapa\t79-5021'}
+                              value={tsvDataB}
+                              onChange={e => setTsvDataB(e.target.value)}
+                              style={{ width: '100%', padding: '0.85rem', borderRadius: '10px', border: '2px solid #d8b4fe', fontFamily: 'monospace', outline: 'none', background: '#fdf8ff', fontSize: '0.82rem', resize: 'vertical', boxSizing: 'border-box' }}
+                            />
+                            <div style={{ fontSize: '0.7rem', color: '#7c3aed', marginTop: '0.25rem' }}>{tsvDataB.trim().split('\n').filter(Boolean).length} student(s) pasted</div>
+                          </div>
+                        </div>
+
+                        {/* Combined preview button */}
+                        <button
+                          onClick={() => {
+                            const parseSection = (raw: string, sec: string, maj: string) =>
+                              raw.trim().split('\n').map(r => {
+                                const cols = r.split('\t')
+                                return {
+                                  name: cols[0]?.trim(),
+                                  roll_no: cols[1]?.trim() || '',
+                                  gender: cols[2]?.trim() || '',
+                                  ethnic_group: cols[3]?.trim() || '',
+                                  tu_regd_no: cols[4]?.trim() || '',
+                                  batch_year: parseInt(selectedAcadYear) || null,
+                                  section: sec,
+                                  major: maj
+                                }
+                              }).filter(r => r.name)
+
+                            const rowsA = tsvData.trim() ? parseSection(tsvData, 'A', 'English') : []
+                            const rowsB = tsvDataB.trim() ? parseSection(tsvDataB, 'B', 'Nepali') : []
+                            const combined = [...rowsA, ...rowsB]
+                            if (!combined.length) return toast.warning('Please paste at least one student')
+                            processInput(combined)
+                          }}
+                          style={{ width: '100%', padding: '1rem', background: '#003292', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                        >
+                          <CheckCircle2 size={18} /> Preview &amp; Verify Data ({(tsvData.trim().split('\n').filter(Boolean).length) + (tsvDataB.trim().split('\n').filter(Boolean).length)} students) →
+                        </button>
+                      </div>
+                    ) : (
+                      // Non-B.Ed.: original single paste area
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>Paste Name &amp; Roll No</label>
+                        <textarea
+                          rows={10}
+                          placeholder={'Ram Sharma\t101\nSita Nepal\t102'}
+                          value={tsvData}
+                          onChange={e => setTsvData(e.target.value)}
+                          style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #3b82f6', fontFamily: 'monospace', outline: 'none', background: 'white', fontSize: '0.85rem', resize: 'vertical' }}
+                        />
+                        <button
+                          onClick={handlePasteInput}
+                          style={{ width: '100%', marginTop: '1rem', padding: '1rem', background: '#003292', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: '1rem' }}
+                        >
+                          Preview &amp; Verify Data →
+                        </button>
+                      </div>
+                    )
                   ) : (
                     <div style={{ padding: '3rem 2rem', border: '2px dashed #cbd5e1', borderRadius: '16px', textAlign: 'center' }}>
                       <div style={{ background: '#eff6ff', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: '#3b82f6' }}>
@@ -559,7 +721,7 @@ export default function StudentRegistry() {
                     </div>
                   </div>
 
-                  <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                  <div id="review-table-scroll" style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                       <thead style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 1 }}>
                         <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
@@ -567,6 +729,9 @@ export default function StudentRegistry() {
                           <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569' }}>Roll No</th>
                           <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569' }}>Gender (Verify)</th>
                           <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569' }}>Ethnic Group (Verify)</th>
+                          {isBEd && <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#0369a1' }}>Section</th>}
+                          {isBEd && <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#7c3aed' }}>Major</th>}
+                          <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: 700, color: '#ef4444' }}>Remove</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -608,11 +773,82 @@ export default function StudentRegistry() {
                                 ))}
                               </select>
                             </td>
+                            {isBEd && (
+                              <td style={{ padding: '0.75rem 1rem' }}>
+                                <select
+                                  value={row.section || 'A'}
+                                  onChange={e => {
+                                    const sec = e.target.value
+                                    updateReviewRow(idx, 'section', sec)
+                                    updateReviewRow(idx, 'major', sec === 'A' ? 'English' : 'Nepali')
+                                  }}
+                                  style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #7dd3fc', outline: 'none', width: '90px', fontSize: '0.8rem', background: row.section === 'A' ? '#eff6ff' : '#fdf4ff', color: row.section === 'A' ? '#1d4ed8' : '#7c3aed', fontWeight: 700 }}
+                                >
+                                  <option value="A">A</option>
+                                  <option value="B">B</option>
+                                </select>
+                              </td>
+                            )}
+                            {isBEd && (
+                              <td style={{ padding: '0.75rem 1rem' }}>
+                                <select
+                                  value={row.major || ''}
+                                  onChange={e => updateReviewRow(idx, 'major', e.target.value)}
+                                  style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #c4b5fd', outline: 'none', width: '100px', fontSize: '0.8rem', background: row.major === 'English' ? '#eff6ff' : '#fdf4ff', color: row.major === 'English' ? '#1d4ed8' : '#7c3aed', fontWeight: 700 }}
+                                >
+                                  <option value="English">🇬🇧 English</option>
+                                  <option value="Nepali">🇳🇵 Nepali</option>
+                                </select>
+                              </td>
+                            )}
+                            <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                              <button
+                                onClick={() => deleteReviewRow(idx)}
+                                title="Remove this student"
+                                style={{ background: 'none', border: '1px solid #fecaca', borderRadius: '6px', padding: '0.3rem 0.5rem', cursor: 'pointer', color: '#ef4444', display: 'inline-flex', alignItems: 'center', transition: 'all 0.15s' }}
+                                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#fef2f2'; }}
+                                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'none'; }}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
+                  {/* Add Missing Student Button */}
+                  <button
+                    onClick={addReviewRow}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '0.5rem',
+                      margin: '0.75rem auto 0',
+                      padding: '0.55rem 1.5rem',
+                      background: 'white',
+                      border: '2px dashed #94a3b8',
+                      borderRadius: '10px',
+                      color: '#475569',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      width: '100%',
+                      justifyContent: 'center',
+                    }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = '#3b82f6'
+                      ;(e.currentTarget as HTMLButtonElement).style.color = '#3b82f6'
+                      ;(e.currentTarget as HTMLButtonElement).style.background = '#eff6ff'
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = '#94a3b8'
+                      ;(e.currentTarget as HTMLButtonElement).style.color = '#475569'
+                      ;(e.currentTarget as HTMLButtonElement).style.background = 'white'
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1rem' }}>+</span>
+                    Add Missing Student
+                  </button>
                 </div>
               )}
             </div>

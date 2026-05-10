@@ -120,7 +120,7 @@ export default function RoleManagementPage() {
                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Action</th>
               </tr>
             </thead>
-            <tbody style={{ divideY: '1px solid #e2e8f0' }}>
+            <tbody className="divide-y divide-gray-200" style={{ background: 'white' }}>
               {filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>

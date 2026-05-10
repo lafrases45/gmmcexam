@@ -17,21 +17,46 @@ export async function getBatches() {
   return data || []
 }
 
-export async function createBatch(name: string, students: any[]) {
+export async function createBatch(name: string, students: any[], appendMode = false) {
   const supabase = await createClient()
-  
-  // 0. Remove any existing batch with the exact same name to prevent duplicates
-  await supabase.from('admission_batches').delete().eq('name', name)
 
-  // 1. Create the batch
-  const { data: batch, error: batchError } = await supabase
-    .from('admission_batches')
-    .insert([{ name, total_students: students.length }])
-    .select()
-    .single()
+  let batch: { id: string; total_students: number }
 
-  if (batchError || !batch) {
-    throw new Error(batchError?.message || "Failed to create batch")
+  if (appendMode) {
+    // B.Ed. mode: append students to existing batch if it exists
+    const { data: existing } = await supabase
+      .from('admission_batches')
+      .select('id, total_students')
+      .eq('name', name)
+      .maybeSingle()
+
+    if (existing) {
+      // Batch exists — just update the count
+      batch = existing
+      await supabase
+        .from('admission_batches')
+        .update({ total_students: (existing.total_students || 0) + students.length })
+        .eq('id', existing.id)
+    } else {
+      // No existing batch — create a new one
+      const { data: newBatch, error: batchError } = await supabase
+        .from('admission_batches')
+        .insert([{ name, total_students: students.length }])
+        .select()
+        .single()
+      if (batchError || !newBatch) throw new Error(batchError?.message || 'Failed to create batch')
+      batch = newBatch
+    }
+  } else {
+    // Default mode: delete any existing batch with same name, then recreate
+    await supabase.from('admission_batches').delete().eq('name', name)
+    const { data: newBatch, error: batchError } = await supabase
+      .from('admission_batches')
+      .insert([{ name, total_students: students.length }])
+      .select()
+      .single()
+    if (batchError || !newBatch) throw new Error(batchError?.message || 'Failed to create batch')
+    batch = newBatch
   }
 
   // 2. Insert students
@@ -43,7 +68,8 @@ export async function createBatch(name: string, students: any[]) {
     tu_regd_no: s.tu_regd_no || '',
     roll_no: s.roll_no || '',
     section: s.section || '',
-    batch_year: s.batch_year || null
+    batch_year: s.batch_year || null,
+    major: s.major || ''
   }))
 
   const { error: studentError } = await supabase
@@ -134,7 +160,8 @@ export async function promoteStudents(sourceBatchId: string, newBatchName: strin
     tu_regd_no: s.tu_regd_no,
     roll_no: s.roll_no,
     section: s.section,
-    batch_year: s.batch_year
+    batch_year: s.batch_year,
+    major: s.major || ''
   }))
 
   const { error: insertError } = await supabase

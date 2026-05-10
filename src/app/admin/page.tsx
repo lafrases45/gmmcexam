@@ -13,14 +13,72 @@ import {
   Layout, ClipboardList, Users, BookOpen, 
   Plus, Search, ArrowRight, Clock, Calendar, 
   CheckSquare, TrendingUp, Database, Shield,
-  ArrowUpRight, MoreHorizontal, Activity
+  ArrowUpRight, MoreHorizontal, Activity, GraduationCap
 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { data: stats, isLoading } = useDashboardStats();
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [genderStats, setGenderStats] = useState({ male: 0, female: 0 });
+  const [allStudentsData, setAllStudentsData] = useState<{ gender: string; ethnic_group: string; batchName: string }[]>([]);
+  const [isProgramLoading, setIsProgramLoading] = useState(true);
+  const [selectedProgramGroup, setSelectedProgramGroup] = useState<string | null>(null);
   const router = useRouter();
+
+  const PROGRAM_GROUPS = [
+    { id: 'bbs',      label: 'BBS',       prefixes: ['BBS'],         color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
+    { id: 'bed',      label: 'B.Ed.',     prefixes: ['B.ED', 'BED'], color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0' },
+    { id: 'bhm',      label: 'BHM',       prefixes: ['BHM'],         color: '#f59e0b', bg: '#fffbeb', border: '#fde68a' },
+    { id: 'bim-bitm', label: 'BIM/BITM',  prefixes: ['BITM', 'BIM'], color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe' },
+    { id: 'mbs',      label: 'MBS',       prefixes: ['MBS'],         color: '#ec4899', bg: '#fdf2f8', border: '#fbcfe8' },
+  ];
+
+  const YEAR_ORDER = [
+    '1st Year','2nd Year','3rd Year','4th Year',
+    '1st Semester','2nd Semester','3rd Semester','4th Semester',
+    '5th Semester','6th Semester','7th Semester','8th Semester',
+  ];
+  const ETHNIC_CATEGORIES = ['Dalit','EDJ','Janajati','Madhesi','Other'];
+
+  function matchesGroup(batchName: string, prefixes: string[]): boolean {
+    const upper = batchName.toUpperCase().trim();
+    return prefixes.some(p => upper.startsWith(p.toUpperCase() + ' ') || upper === p.toUpperCase());
+  }
+
+  function extractYear(batchName: string): string {
+    for (const y of YEAR_ORDER) {
+      if (batchName.includes(y)) return y;
+    }
+    return 'Other';
+  }
+
+  function isGenderMale(g: string): boolean { return ['male','m'].includes(g.toLowerCase()); }
+  function isGenderFemale(g: string): boolean { return ['female','f'].includes(g.toLowerCase()); }
+
+  useEffect(() => {
+    async function fetchStudentStats() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('admission_students')
+        .select('gender, ethnic_group, admission_batches!inner(name)');
+
+      const students = (data || []).map((s: any) => ({
+        gender: s.gender || '',
+        ethnic_group: s.ethnic_group || 'Other',
+        batchName: s.admission_batches?.name || '',
+      }));
+
+      setAllStudentsData(students);
+      setGenderStats({
+        male: students.filter(s => isGenderMale(s.gender)).length,
+        female: students.filter(s => isGenderFemale(s.gender)).length,
+      });
+      setIsProgramLoading(false);
+    }
+    fetchStudentStats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Map RPC data to component variables
   const boardExams = stats?.board_exams || [];
@@ -90,246 +148,364 @@ export default function AdminDashboard() {
     <div className="animate-in fade-in duration-700">
       <div className={styles.pageHeader}>
         <h1>Welcome back, Admin 👋</h1>
-        <p>Here&apos;s what&apos;s happening with your institution today.</p>
+        <p>Here&apos;s an overview of your active students and examination status.</p>
       </div>
 
-      {/* Top Stats Row */}
-      <div className={styles.dashboardGrid}>
-        <div className={styles.statCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <div style={{ background: '#eff6ff', color: '#3b82f6', padding: '0.5rem', borderRadius: '10px' }}>
-              <ClipboardList size={20} />
+      {/* 1. Active Students Section */}
+      <section style={{ marginBottom: '3rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Users size={24} color="#3b82f6" /> Active Students Overview
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', transition: 'transform 0.2s', cursor: 'pointer' }} className="hover:-translate-y-1 hover:shadow-lg">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ background: '#eff6ff', padding: '1.25rem', borderRadius: '16px', color: '#3b82f6' }}>
+                <GraduationCap size={32} />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Active</p>
+                <h3 style={{ margin: 0, fontSize: '2.5rem', fontWeight: 800, color: '#0f172a' }}>{studentCount.toLocaleString()}</h3>
+              </div>
             </div>
-            <MoreHorizontal size={16} color="#94a3b8" />
           </div>
-          <h4>Total Exams</h4>
-          <p>{internalStats.totalExams + boardExams.length}</p>
-          <Link href="/admin/internal-exams">View all exams &rarr;</Link>
+
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', transition: 'transform 0.2s', cursor: 'pointer' }} className="hover:-translate-y-1 hover:shadow-lg">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ background: '#f0fdf4', padding: '1.25rem', borderRadius: '16px', color: '#22c55e' }}>
+                <Users size={32} />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Male</p>
+                <h3 style={{ margin: 0, fontSize: '2.5rem', fontWeight: 800, color: '#0f172a' }}>
+                  {genderStats.male || '-'}
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', transition: 'transform 0.2s', cursor: 'pointer' }} className="hover:-translate-y-1 hover:shadow-lg">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ background: '#fdf2f8', padding: '1.25rem', borderRadius: '16px', color: '#ec4899' }}>
+                <Users size={32} />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Female</p>
+                <h3 style={{ margin: 0, fontSize: '2.5rem', fontWeight: 800, color: '#0f172a' }}>
+                  {genderStats.female || '-'}
+                </h3>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div className={styles.statCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <div style={{ background: '#fff7ed', color: '#f97316', padding: '0.5rem', borderRadius: '10px' }}>
-              <Clock size={20} />
-            </div>
-            <MoreHorizontal size={16} color="#94a3b8" />
+        {/* Program Wise Student Statistics */}
+        <div style={{ marginTop: '2.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <GraduationCap size={20} color="#6366f1" />
+              Program Wise Student Statistics
+            </h3>
+            <Link href="/admin/students" style={{ fontSize: '0.8rem', fontWeight: 600, color: '#6366f1', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              View Registry <ArrowRight size={14} />
+            </Link>
           </div>
-          <h4>Pending Marks Entry</h4>
-          <p>28</p>
-          <Link href="/admin/internal-exams?tab=teachers">View pending &rarr;</Link>
-        </div>
 
-        <div className={styles.statCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <div style={{ background: '#f0fdf4', color: '#22c55e', padding: '0.5rem', borderRadius: '10px' }}>
-              <Users size={20} />
+          {isProgramLoading ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1.5rem', background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', color: '#94a3b8' }}>
+              <RefreshCw size={16} style={{ animation: 'spin 1s linear infinite' }} />
+              <span style={{ fontSize: '0.85rem' }}>Loading program statistics...</span>
             </div>
-            <MoreHorizontal size={16} color="#94a3b8" />
-          </div>
-          <h4>Teachers Registered</h4>
-          <p>{teacherCount}</p>
-          <Link href="/admin/teachers">View teachers &rarr;</Link>
-        </div>
+          ) : (() => {
+            // Compute per-program summaries
+            const summaries = PROGRAM_GROUPS.map(grp => {
+              const students = allStudentsData.filter(s => matchesGroup(s.batchName, grp.prefixes));
+              return {
+                ...grp,
+                total: students.length,
+                male: students.filter(s => isGenderMale(s.gender)).length,
+                female: students.filter(s => isGenderFemale(s.gender)).length,
+              };
+            });
 
-        <div className={styles.statCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <div style={{ background: '#f5f3ff', color: '#8b5cf6', padding: '0.5rem', borderRadius: '10px' }}>
-              <TrendingUp size={20} />
-            </div>
-            <MoreHorizontal size={16} color="#94a3b8" />
-          </div>
-          <h4>Results Published</h4>
-          <p>18</p>
-          <Link href="/admin/results">View results &rarr;</Link>
-        </div>
+            // Compute detail view for selected program
+            const selectedGroup = PROGRAM_GROUPS.find(g => g.id === selectedProgramGroup);
+            const detailStudents = selectedGroup
+              ? allStudentsData.filter(s => matchesGroup(s.batchName, selectedGroup.prefixes))
+              : [];
 
-        <div className={styles.statCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <div style={{ background: '#fdf2f8', color: '#ec4899', padding: '0.5rem', borderRadius: '10px' }}>
-              <Users size={20} />
-            </div>
-            <MoreHorizontal size={16} color="#94a3b8" />
-          </div>
-          <h4>Total Students</h4>
-          <p>{studentCount.toLocaleString()}</p>
-          <Link href="/admin/students">View students &rarr;</Link>
-        </div>
-      </div>
+            // Year/Semester rows
+            const yearMap: Record<string, { total: number; male: number; female: number }> = {};
+            detailStudents.forEach(s => {
+              const label = extractYear(s.batchName);
+              if (!yearMap[label]) yearMap[label] = { total: 0, male: 0, female: 0 };
+              yearMap[label].total++;
+              if (isGenderMale(s.gender)) yearMap[label].male++;
+              else if (isGenderFemale(s.gender)) yearMap[label].female++;
+            });
+            const yearRows = YEAR_ORDER.filter(y => yearMap[y]).map(y => ({ label: y, ...yearMap[y] }));
 
-      {/* Middle Row: Today's Tasks, Recent Activity, Upcoming Exams */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.2fr', gap: '1.5rem', marginBottom: '2rem' }}>
-        {/* Today's Tasks */}
-        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <CheckSquare size={20} color="#1e293b" />
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Today&apos;s Tasks</h3>
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {[
-              { task: 'Enter marks for BBS 2nd Year - Internal Exam', priority: 'High', color: '#ef4444' },
-              { task: 'Review and publish BBS 1st Year results', priority: 'Medium', color: '#f59e0b' },
-              { task: 'Publish BBS 4th Year Board Exam results', priority: 'Low', color: '#10b981' },
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: '#f8fafc', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ width: '24px', height: '24px', border: '2px solid #cbd5e1', borderRadius: '6px' }} />
-                  <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', margin: 0 }}>{item.task}</p>
+            // Ethnic rows
+            const ethnicMap: Record<string, { male: number; female: number; total: number }> = {};
+            ETHNIC_CATEGORIES.forEach(e => { ethnicMap[e] = { male: 0, female: 0, total: 0 }; });
+            detailStudents.forEach(s => {
+              const key = ETHNIC_CATEGORIES.includes(s.ethnic_group) ? s.ethnic_group : 'Other';
+              ethnicMap[key].total++;
+              if (isGenderMale(s.gender)) ethnicMap[key].male++;
+              else if (isGenderFemale(s.gender)) ethnicMap[key].female++;
+            });
+            const ethnicRows = ETHNIC_CATEGORIES.map(e => ({ category: e, ...ethnicMap[e] }));
+
+            const thStyle: React.CSSProperties = { padding: '0.85rem 1.1rem', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' };
+            const tdStyle: React.CSSProperties = { padding: '0.8rem 1.1rem', fontSize: '0.88rem', fontWeight: 600, borderBottom: '1px solid #f1f5f9' };
+
+            return (
+              <>
+                {/* Program Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '1rem', marginBottom: selectedProgramGroup ? '1.5rem' : 0 }}>
+                  {summaries.map(prog => {
+                    const isActive = selectedProgramGroup === prog.id;
+                    return (
+                      <div
+                        key={prog.id}
+                        onClick={() => setSelectedProgramGroup(isActive ? null : prog.id)}
+                        style={{
+                          background: isActive ? prog.bg : 'white',
+                          border: isActive ? `2px solid ${prog.color}` : '1px solid #e2e8f0',
+                          borderRadius: '16px',
+                          padding: '1.25rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          boxShadow: isActive ? `0 4px 16px ${prog.color}30` : '0 2px 4px rgba(0,0,0,0.04)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                          <span style={{ fontWeight: 800, fontSize: '1rem', color: prog.color }}>{prog.label}</span>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 700, background: isActive ? prog.color : prog.bg, color: isActive ? 'white' : prog.color, padding: '0.2rem 0.55rem', borderRadius: '20px', whiteSpace: 'nowrap' }}>
+                            {isActive ? '✕ Close' : 'View More'}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
+                            <span>Total</span>
+                            <strong style={{ color: '#0f172a' }}>{prog.total}</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
+                            <span>Male</span>
+                            <strong style={{ color: '#3b82f6' }}>{prog.male}</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
+                            <span>Female</span>
+                            <strong style={{ color: '#ec4899' }}>{prog.female}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.5rem', background: item.color + '10', color: item.color, borderRadius: '4px' }}>{item.priority}</span>
-              </div>
-            ))}
-          </div>
-          <Link href="#" style={{ display: 'block', marginTop: '1.5rem', fontSize: '0.85rem', color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View all tasks &rarr;</Link>
-        </div>
 
-        {/* Recent Activity */}
-        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Activity size={20} color="#1e293b" />
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Recent Activity</h3>
-            </div>
-            <Link href="#" style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View all</Link>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {[
-              { user: 'Ram Sharma', action: 'submitted marks for', subject: 'BBS 2nd Year - Business Statistics', time: '10 min ago' },
-              { user: 'Admin', action: 'published results for', subject: 'BBS 1st Year', time: '1 hour ago' },
-              { user: 'Admin', action: 'created new internal exam', subject: 'BBS 2nd Year - Mid Term', time: '3 hours ago' },
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#e2e8f0', flexShrink: 0 }} />
-                <div>
-                  <p style={{ fontSize: '0.75rem', margin: 0, color: '#1e293b', lineHeight: '1.4' }}>
-                    <strong>{item.user}</strong> {item.action} <span style={{ color: '#64748b' }}>{item.subject}</span>
-                  </p>
-                  <p style={{ fontSize: '0.65rem', color: '#94a3b8', margin: '0.25rem 0 0 0' }}>{item.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                {/* Detail Panel */}
+                {selectedProgramGroup && selectedGroup && (
+                  <div style={{ background: 'white', borderRadius: '16px', border: `1px solid ${selectedGroup.border}`, overflow: 'hidden', boxShadow: `0 4px 20px ${selectedGroup.color}15` }}>
+                    <div style={{ background: selectedGroup.bg, padding: '1rem 1.25rem', borderBottom: `1px solid ${selectedGroup.border}`, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <GraduationCap size={18} color={selectedGroup.color} />
+                      <span style={{ fontWeight: 700, color: selectedGroup.color, fontSize: '0.95rem' }}>{selectedGroup.label} — Detailed Breakdown</span>
+                    </div>
 
-        {/* Student Demographics */}
-        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Users size={20} color="#1e293b" />
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Student Demographics</h3>
-            </div>
-            <Link href="/admin/admissions" style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View all</Link>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {ethnicData.length > 0 ? ethnicData.map((item: any, i: number) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color }} />
-                  <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>{item.name}</p>
-                </div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>
-                  {item.count} <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 500 }}>students</span>
-                </div>
-              </div>
-            )) : (
-              <p style={{ fontSize: '0.8rem', color: '#64748b' }}>No demographic data available.</p>
-            )}
-          </div>
-        </div>
-      </div>
+                    {detailStudents.length === 0 ? (
+                      <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>No students found for this program.</div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
 
-      {/* Bottom Row: Chart, Quick Actions, System Status */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.2fr', gap: '1.5rem' }}>
-        {/* Marks Entry Overview (Chart Mockup) */}
-        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 700 }}>Marks Entry Overview</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            {/* Simple SVG Donut Chart */}
-            <div style={{ position: 'relative', width: '140px', height: '140px' }}>
-              <svg width="140" height="140" viewBox="0 0 40 40">
-                <circle cx="20" cy="20" r="16" fill="transparent" stroke="#f1f5f9" strokeWidth="4" />
-                <circle cx="20" cy="20" r="16" fill="transparent" stroke="#22c55e" strokeWidth="4" strokeDasharray="62 100" strokeDashoffset="0" transform="rotate(-90 20 20)" />
-                <circle cx="20" cy="20" r="16" fill="transparent" stroke="#f59e0b" strokeWidth="4" strokeDasharray="24 100" strokeDashoffset="-62" transform="rotate(-90 20 20)" />
-                <circle cx="20" cy="20" r="16" fill="transparent" stroke="#ef4444" strokeWidth="4" strokeDasharray="14 100" strokeDashoffset="-86" transform="rotate(-90 20 20)" />
-              </svg>
-              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                <p style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>62%</p>
-                <p style={{ fontSize: '0.5rem', color: '#94a3b8', margin: 0, textTransform: 'uppercase' }}>Completed</p>
-              </div>
-            </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                <span style={{ color: '#64748b' }}>● Completed</span>
-                <span style={{ fontWeight: 700 }}>62%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                <span style={{ color: '#f59e0b' }}>● In Progress</span>
-                <span style={{ fontWeight: 700 }}>24%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                <span style={{ color: '#ef4444' }}>● Not Started</span>
-                <span style={{ fontWeight: 700 }}>14%</span>
-              </div>
-            </div>
-          </div>
-        </div>
+                        {/* Year/Semester Table */}
+                        <div style={{ borderRight: '1px solid #f1f5f9' }}>
+                          <div style={{ padding: '0.85rem 1.1rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Year / Semester</span>
+                          </div>
+                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                                <th style={{ ...thStyle, textAlign: 'left', color: '#475569' }}>Level</th>
+                                <th style={{ ...thStyle, textAlign: 'center', color: '#3b82f6' }}>M</th>
+                                <th style={{ ...thStyle, textAlign: 'center', color: '#ec4899' }}>F</th>
+                                <th style={{ ...thStyle, textAlign: 'center', color: '#475569' }}>Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {yearRows.length === 0 ? (
+                                <tr><td colSpan={4} style={{ ...tdStyle, textAlign: 'center', color: '#94a3b8' }}>No data</td></tr>
+                              ) : yearRows.map(row => (
+                                <tr key={row.label} onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                                  <td style={{ ...tdStyle, color: '#1e293b' }}>{row.label}</td>
+                                  <td style={{ ...tdStyle, textAlign: 'center', color: '#3b82f6' }}>{row.male}</td>
+                                  <td style={{ ...tdStyle, textAlign: 'center', color: '#ec4899' }}>{row.female}</td>
+                                  <td style={{ ...tdStyle, textAlign: 'center', fontWeight: 800, color: '#0f172a' }}>{row.total}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                            <tfoot>
+                              <tr style={{ background: '#f0f9ff', borderTop: '2px solid #bae6fd' }}>
+                                <td style={{ ...tdStyle, borderBottom: 'none', fontWeight: 800, color: '#0369a1' }}>Total</td>
+                                <td style={{ ...tdStyle, borderBottom: 'none', textAlign: 'center', fontWeight: 800, color: '#3b82f6' }}>{yearRows.reduce((s,r)=>s+r.male,0)}</td>
+                                <td style={{ ...tdStyle, borderBottom: 'none', textAlign: 'center', fontWeight: 800, color: '#ec4899' }}>{yearRows.reduce((s,r)=>s+r.female,0)}</td>
+                                <td style={{ ...tdStyle, borderBottom: 'none', textAlign: 'center', fontWeight: 800, color: '#0369a1' }}>{yearRows.reduce((s,r)=>s+r.total,0)}</td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
 
-        {/* Quick Actions */}
-        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 700 }}>Quick Actions</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-             <Link href="/admin/internal-exams" style={{ padding: '1rem', background: '#f0fdf4', borderRadius: '16px', textDecoration: 'none' }}>
-                <Plus size={18} color="#22c55e" />
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, margin: '0.5rem 0 0 0', color: '#166534' }}>Create Exam</p>
-             </Link>
-             <Link href="/admin/internal-exams?tab=teachers" style={{ padding: '1rem', background: '#eff6ff', borderRadius: '16px', textDecoration: 'none' }}>
-                <Users size={18} color="#3b82f6" />
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, margin: '0.5rem 0 0 0', color: '#1e40af' }}>Assign Subjects</p>
-             </Link>
-             <Link href="/teacher/login" style={{ padding: '1rem', background: '#f5f3ff', borderRadius: '16px', textDecoration: 'none' }}>
-                <CheckSquare size={18} color="#8b5cf6" />
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, margin: '0.5rem 0 0 0', color: '#5b21b6' }}>Enter Marks</p>
-             </Link>
-             <Link href="/admin/results" style={{ padding: '1rem', background: '#fff7ed', borderRadius: '16px', textDecoration: 'none' }}>
-                <ArrowUpRight size={18} color="#f97316" />
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, margin: '0.5rem 0 0 0', color: '#9a3412' }}>Publish Results</p>
-             </Link>
-          </div>
-        </div>
+                        {/* Ethnic Table */}
+                        <div>
+                          <div style={{ padding: '0.85rem 1.1rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ethnic Category</span>
+                          </div>
+                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                                <th style={{ ...thStyle, textAlign: 'left', color: '#475569' }}>Category</th>
+                                <th style={{ ...thStyle, textAlign: 'center', color: '#3b82f6' }}>M</th>
+                                <th style={{ ...thStyle, textAlign: 'center', color: '#ec4899' }}>F</th>
+                                <th style={{ ...thStyle, textAlign: 'center', color: '#475569' }}>Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {ethnicRows.map(row => (
+                                <tr key={row.category} onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                                  <td style={{ ...tdStyle, color: '#1e293b' }}>{row.category}</td>
+                                  <td style={{ ...tdStyle, textAlign: 'center', color: '#3b82f6' }}>{row.male}</td>
+                                  <td style={{ ...tdStyle, textAlign: 'center', color: '#ec4899' }}>{row.female}</td>
+                                  <td style={{ ...tdStyle, textAlign: 'center', fontWeight: 800, color: '#0f172a' }}>{row.total}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                            <tfoot>
+                              <tr style={{ background: '#f0f9ff', borderTop: '2px solid #bae6fd' }}>
+                                <td style={{ ...tdStyle, borderBottom: 'none', fontWeight: 800, color: '#0369a1' }}>Grand Total</td>
+                                <td style={{ ...tdStyle, borderBottom: 'none', textAlign: 'center', fontWeight: 800, color: '#3b82f6' }}>{ethnicRows.reduce((s,r)=>s+r.male,0)}</td>
+                                <td style={{ ...tdStyle, borderBottom: 'none', textAlign: 'center', fontWeight: 800, color: '#ec4899' }}>{ethnicRows.reduce((s,r)=>s+r.female,0)}</td>
+                                <td style={{ ...tdStyle, borderBottom: 'none', textAlign: 'center', fontWeight: 800, color: '#0369a1' }}>{ethnicRows.reduce((s,r)=>s+r.total,0)}</td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
 
-        {/* System Status */}
-        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 700 }}>System Status</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <Database size={16} color="#64748b" />
-                <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 600 }}>Database</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      </section>
+
+      {/* 2. Internal Exam Section */}
+      <section style={{ marginBottom: '3rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ClipboardList size={24} color="#8b5cf6" /> Internal Exam
+          </h2>
+          <Link href="/admin/internal-exams" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#8b5cf6', background: '#f5f3ff', padding: '0.5rem 1rem', borderRadius: '8px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }} className="hover:bg-purple-100">
+            View Internal Reports <ArrowRight size={16} />
+          </Link>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Total Internal Exams</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>{internalStats.totalExams}</h3>
               </div>
-              <span style={{ fontSize: '0.7rem', color: '#22c55e', fontWeight: 700 }}>● Connected</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <Shield size={16} color="#64748b" />
-                <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 600 }}>Security (RLS)</span>
+              <div style={{ background: '#f1f5f9', padding: '0.75rem', borderRadius: '10px', color: '#64748b' }}>
+                <ClipboardList size={20} />
               </div>
-              <span style={{ fontSize: '0.7rem', color: '#22c55e', fontWeight: 700 }}>● Active</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <Save size={16} color="#64748b" />
-                <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 600 }}>Backups</span>
-              </div>
-              <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600 }}>Last: 2h ago</span>
             </div>
           </div>
-          <button onClick={handleBackup} disabled={isBackingUp} style={{ width: '100%', marginTop: '1.5rem', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '0.8rem', fontWeight: 700, color: '#475569', cursor: 'pointer' }}>
-            {isBackingUp ? 'Processing...' : 'Run Manual Backup'}
-          </button>
-      </div>
+
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Total Appeared</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>-</h3>
+              </div>
+              <div style={{ background: '#f1f5f9', padding: '0.75rem', borderRadius: '10px', color: '#64748b' }}>
+                <Users size={20} />
+              </div>
+            </div>
+            <p style={{ margin: '1rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>Data compiling from ledgers</p>
+          </div>
+
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Pending Marks</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>
+                  {internalStats.activeExams} <span style={{ fontSize: '1rem', fontWeight: 600, color: '#94a3b8' }}>exams</span>
+                </h3>
+              </div>
+              <div style={{ background: '#fef2f2', padding: '0.75rem', borderRadius: '10px', color: '#ef4444' }}>
+                <Clock size={20} />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. Board Exam Section */}
+      <section style={{ marginBottom: '3rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <BookOpen size={24} color="#f97316" /> Board Exam
+          </h2>
+          <Link href="/admin/board-exams" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#f97316', background: '#fff7ed', padding: '0.5rem 1rem', borderRadius: '8px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }} className="hover:bg-orange-100">
+            View Board Reports <ArrowRight size={16} />
+          </Link>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Total Board Exams</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>{boardExams.length}</h3>
+              </div>
+              <div style={{ background: '#f1f5f9', padding: '0.75rem', borderRadius: '10px', color: '#64748b' }}>
+                <BookOpen size={20} />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Total Appeared</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>-</h3>
+              </div>
+              <div style={{ background: '#f1f5f9', padding: '0.75rem', borderRadius: '10px', color: '#64748b' }}>
+                <Users size={20} />
+              </div>
+            </div>
+            <p style={{ margin: '1rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>Data compiling from ledgers</p>
+          </div>
+
+          <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Pending Results</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>-</h3>
+              </div>
+              <div style={{ background: '#fffbeb', padding: '0.75rem', borderRadius: '10px', color: '#f59e0b' }}>
+                <Clock size={20} />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
     </div>
-  </div>
   );
 }
 
