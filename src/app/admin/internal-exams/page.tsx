@@ -35,16 +35,16 @@ export default function ExamsPage() {
     <div className={styles.examContainer}>
       {role === 'Admin' || role === 'Department Head' ? (
         <AdminPanel 
-          exams={data.exams} 
-          subjects={data.subjects} 
-          ledger={data.ledger} 
-          teacherRegistry={data.teacherRegistry}
-          profiles={data.profiles}
+          exams={data?.exams || []} 
+          subjects={data?.subjects || []} 
+          ledger={data?.ledger || []} 
+          teacherRegistry={data?.teacherRegistry || []}
+          profiles={data?.profiles || []}
         />
       ) : (
         <TeacherPanel 
-          initialExams={data.teacherExams} 
-          initialAssignments={data.teacherAssignments} 
+          initialExams={data?.teacherExams || []} 
+          initialAssignments={data?.teacherAssignments || []} 
         />
       )}
     </div>
