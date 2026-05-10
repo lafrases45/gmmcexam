@@ -63,16 +63,17 @@ export default function AdminDashboard() {
         .from('admission_students')
         .select('gender, ethnic_group, admission_batches!inner(name)');
 
-      const students = (data || []).map((s: any) => ({
-        gender: s.gender || '',
-        ethnic_group: s.ethnic_group || 'Other',
-        batchName: s.admission_batches?.name || '',
-      }));
+      const students: { gender: string; ethnic_group: string; batchName: string }[] =
+        (data || []).map((s: any) => ({
+          gender: s.gender || '',
+          ethnic_group: s.ethnic_group || 'Other',
+          batchName: s.admission_batches?.name || '',
+        }));
 
       setAllStudentsData(students);
       setGenderStats({
-        male: students.filter(s => isGenderMale(s.gender)).length,
-        female: students.filter(s => isGenderFemale(s.gender)).length,
+        male: students.filter((s) => isGenderMale(s.gender)).length,
+        female: students.filter((s) => isGenderFemale(s.gender)).length,
       });
       setIsProgramLoading(false);
     }
