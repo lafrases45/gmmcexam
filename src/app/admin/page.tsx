@@ -222,7 +222,7 @@ export default function AdminDashboard() {
             <Link href="/admin/admissions" style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View all</Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {ethnicData.length > 0 ? ethnicData.map((item, i) => (
+            {ethnicData.length > 0 ? ethnicData.map((item: any, i: number) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color }} />
