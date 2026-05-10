@@ -56,13 +56,36 @@ export default function AdmissionAnalysis() {
       const { data: stds, error: fetchErr } = await supabaseClient.from('admission_students').select('*').eq('batch_id', batchId);
       if (fetchErr) throw fetchErr;
 
-      const parsed: Student[] = stds.map((s: any, idx: number) => ({
-        sn: idx + 1,
-        name: s.name,
-        gender: s.gender as Gender,
-        ethnic: s.ethnic_group as EthnicGroup,
-        tuRegd: s.tu_regd_no || s.roll_no || ''
-      }));
+      const parsed: Student[] = stds.map((s: any) => {
+        let mappedGender: Gender | '' = '';
+        if (s.gender === 'Male') mappedGender = 'M';
+        else if (s.gender === 'Female') mappedGender = 'F';
+
+        let mappedEthnic: EthnicGroup | '' = '';
+        const rawEth = s.ethnic_group || '';
+        const matched = ETHNIC_OPTIONS.find(opt => opt.toLowerCase() === rawEth.toLowerCase());
+        if (matched) mappedEthnic = matched;
+
+        return {
+          sn: 0, // Will be assigned after sort
+          name: s.name,
+          gender: mappedGender,
+          ethnic: mappedEthnic,
+          tuRegd: s.tu_regd_no || s.roll_no || ''
+        };
+      });
+
+      // Sort by Roll No (tuRegd) alphanumerically
+      parsed.sort((a, b) => {
+        const rollA = String(a.tuRegd || '');
+        const rollB = String(b.tuRegd || '');
+        return rollA.localeCompare(rollB, undefined, { numeric: true, sensitivity: 'base' });
+      });
+
+      // Re-assign Serial Numbers (sn) after sorting
+      parsed.forEach((s, idx) => {
+        s.sn = idx + 1;
+      });
 
       setStudents(parsed);
       setIsLoadedFromDb(true);
@@ -139,12 +162,24 @@ export default function AdmissionAnalysis() {
           if (!ethnic && name) ethnic = guessEthnicGroup(name);
 
           return {
-            sn: idx + 1,
+            sn: 0, // Will be assigned after sort
             name,
             gender: gender || '',
             ethnic: ethnic || '',
             tuRegd: row['TU Registration Number'] || row['Registration No.'] || row['Registration No'] || row['TU Registration'] || row['TU Reg. No.'] || row['TU Reg No'] || row['TU Reg.'] || row.Regd || row['TU Regd'] || row.tuRegd || row.Registration || row.Roll || row['Roll No'] || row.roll || '',
           };
+        });
+
+        // Sort by Roll No (tuRegd) alphanumerically
+        parsedStudents.sort((a, b) => {
+          const rollA = String(a.tuRegd || '');
+          const rollB = String(b.tuRegd || '');
+          return rollA.localeCompare(rollB, undefined, { numeric: true, sensitivity: 'base' });
+        });
+
+        // Re-assign Serial Numbers (sn) after sorting
+        parsedStudents.forEach((s, idx) => {
+          s.sn = idx + 1;
         });
 
         setStudents(parsedStudents);
