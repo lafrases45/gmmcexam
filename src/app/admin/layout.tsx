@@ -6,13 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { usePrefetchData } from '@/lib/hooks/usePrefetchData';
 import styles from './admin.module.css';
-import { 
-  LayoutDashboard, BookOpen, ClipboardList, BarChart3, 
-  Users, UserPlus, GraduationCap, Settings, 
-  ShieldCheck, Database, Search, Bell, Menu, 
-  ChevronLeft, LogOut, FileText, UserCheck, 
-  Settings2, Activity, Layout, X
-} from 'lucide-react';
+import { LayoutDashboard, BookOpen, ClipboardList, BarChart3, Users, UserPlus, GraduationCap, Settings, ShieldCheck, Database, Search, Bell, Menu, ChevronLeft, LogOut, FileText, UserCheck, Settings2, Activity, Layout, X, Clock, Calendar } from 'lucide-react';
 
 export default function AdminLayout({
   children,
@@ -27,12 +21,27 @@ export default function AdminLayout({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
+  const [showFallback, setShowFallback] = useState(false);
+
+  const isLoginPage = pathname === '/admin/login';
+
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileOpen(false);
   }, [pathname]);
 
-  const isLoginPage = pathname === '/admin/login';
+  // Fallback timeout for session check
+  useEffect(() => {
+    let timer: any;
+    if (loading && !session && !isLoginPage) {
+      timer = setTimeout(() => {
+        setShowFallback(true);
+      }, 8000); // 8 seconds timeout
+    } else {
+      setShowFallback(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading, session, isLoginPage]);
 
   useEffect(() => {
     if (!loading && !session && !isLoginPage) {
@@ -41,15 +50,34 @@ export default function AdminLayout({
   }, [session, loading, isLoginPage, router]);
 
   // Only show the full-screen spinner on the initial load when there's no session yet.
-  // Once we have a session or have determined there isn't one, we let the children handle their own loading states.
   if (loading && !session && !isLoginPage) {
     return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid #cbd5e1', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-          <p style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Verifying Session...</p>
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', padding: '2rem', textAlign: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', maxWidth: '300px' }}>
+          <div style={{ width: '45px', height: '45px', border: '3px solid #e2e8f0', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+          <div>
+            <p style={{ color: '#1e293b', fontSize: '1rem', fontWeight: 600, margin: '0 0 0.5rem 0' }}>Verifying Session</p>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', margin: 0 }}>Please wait while we secure your connection...</p>
+          </div>
+          
+          {showFallback && (
+            <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
+              <button 
+                onClick={() => window.location.reload()}
+                style={{ padding: '0.6rem 1.2rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', marginBottom: '0.75rem', width: '100%' }}
+              >
+                Reload Page
+              </button>
+              <button 
+                onClick={() => router.push('/admin/login')}
+                style={{ padding: '0.6rem 1.2rem', background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', width: '100%' }}
+              >
+                Go to Login
+              </button>
+            </div>
+          )}
         </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
       </div>
     );
   }
@@ -66,7 +94,12 @@ export default function AdminLayout({
       { name: 'Board Exams', icon: BookOpen, href: '/admin/board-exams' },
       { name: 'Internal Exams', icon: ClipboardList, href: '/admin/internal-exams' },
       { name: 'Seat Plan', icon: Layout, href: '/admin/seat-plan' },
-      { name: 'Results', icon: FileText, href: '/admin/results' },
+
+    ]},
+    { category: 'ATTENDANCE', items: [
+      { name: 'Live Dashboard', icon: Clock, href: '/admin/attendance' },
+      { name: 'Monthly Ledger', icon: FileText, href: '/admin/attendance/reports' },
+      { name: 'Holiday Setup', icon: Calendar, href: '/admin/attendance/holidays' },
     ]},
     { category: 'TEACHERS', items: [
       { name: 'Teacher List', icon: Users, href: '/admin/internal-exams?tab=teachers' },
@@ -104,7 +137,7 @@ export default function AdminLayout({
 
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${isMobileOpen ? styles.mobileOpen : ''}`}>
-        <div className={styles.sidebarLogo}>
+        <Link href="/" className={styles.sidebarLogo} style={{ textDecoration: 'none' }}>
           <div style={{ background: '#3b82f6', padding: '0.5rem', borderRadius: '10px' }}>
             <Database size={24} color="white" />
           </div>
@@ -114,10 +147,10 @@ export default function AdminLayout({
               <p>Education Management</p>
             </div>
           )}
-          <button className={styles.mobileCloseBtn} onClick={() => setIsMobileOpen(false)}>
+          <button className={styles.mobileCloseBtn} onClick={(e) => { e.preventDefault(); setIsMobileOpen(false); }}>
             <X size={24} />
           </button>
-        </div>
+        </Link>
 
         <nav className={styles.sidebarNav}>
           <Link href="/admin" className={`${styles.sidebarLink} ${pathname === '/admin' ? styles.active : ''}`}>

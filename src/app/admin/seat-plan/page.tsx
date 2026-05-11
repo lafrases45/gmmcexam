@@ -44,6 +44,8 @@ export default function SeatPlanPage() {
 
   const [savedBatches, setSavedBatches] = useState<any[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState('');
+  const [registryProgramFilter, setRegistryProgramFilter] = useState('');
+  const [registryYearFilter, setRegistryYearFilter] = useState('');
 
   // Custom UI State
   const [confirmModal, setConfirmModal] = useState<{ message: string, onConfirm: () => void } | null>(null);
@@ -72,6 +74,24 @@ export default function SeatPlanPage() {
       setGroupedExams(Object.values(groups))
     }
   }, [examsData]);
+
+  // Auto-populate context when exam is selected
+  useEffect(() => {
+    if (selectedGroupId && groupedExams.length > 0) {
+      const group = groupedExams.find(g => (g[0].group_id || `single-${g[0].id}`) === selectedGroupId);
+      if (group) {
+        // If it's a single program group, auto-select it
+        if (group.length === 1) {
+          setSelectedProgram(group[0].program);
+          setSelectedTerm(group[0].year_or_semester);
+        } else {
+          // If multiple programs, just clear them to force selection
+          setSelectedProgram('');
+          setSelectedTerm('');
+        }
+      }
+    }
+  }, [selectedGroupId, groupedExams]);
 
   useEffect(() => {
     if (batchesData) setSavedBatches(batchesData);
@@ -189,6 +209,27 @@ export default function SeatPlanPage() {
     });
     return Object.entries(groups);
   }, [students]);
+
+  const filteredBatches = useMemo(() => {
+    let result = savedBatches;
+    const prog = registryProgramFilter || selectedProgram;
+    const term = registryYearFilter || selectedTerm;
+
+    if (prog) {
+      result = result.filter(b => b.name.toLowerCase().includes(prog.toLowerCase()));
+    }
+    if (term) {
+      result = result.filter(b => b.name.toLowerCase().includes(term.toLowerCase()));
+    }
+    return result;
+  }, [savedBatches, registryProgramFilter, registryYearFilter, selectedProgram, selectedTerm]);
+
+  // Auto-select batch if unique match found
+  useEffect(() => {
+    if (filteredBatches.length === 1 && !selectedBatchId) {
+      setSelectedBatchId(filteredBatches[0].id);
+    }
+  }, [filteredBatches, selectedBatchId]);
 
   const removeStudentGroup = (groupKey: string) => {
     setStudents(prev => prev.filter(s => {
@@ -823,8 +864,6 @@ export default function SeatPlanPage() {
                   value={selectedGroupId} 
                   onChange={e => {
                     setSelectedGroupId(e.target.value);
-                    setSelectedProgram('');
-                    setSelectedTerm('');
                   }}
                   style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '2px solid #3b82f644', fontSize: '0.85rem', background: '#f8fafc' }}
                 >
@@ -941,14 +980,42 @@ export default function SeatPlanPage() {
 
                 <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 'bold', color: '#0f172a' }}>Load from Admissions Registry</label>
+                  
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <select 
+                      className={styles.formInput}
+                      value={registryProgramFilter}
+                      onChange={e => setRegistryProgramFilter(e.target.value)}
+                      style={{ flex: 1, fontSize: '0.75rem', height: '32px' }}
+                    >
+                      <option value="">-- All Programs --</option>
+                      {Array.from(new Set(savedBatches.map(b => b.name.split(' ')[0]))).map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                    <select 
+                      className={styles.formInput}
+                      value={registryYearFilter}
+                      onChange={e => setRegistryYearFilter(e.target.value)}
+                      style={{ flex: 1, fontSize: '0.75rem', height: '32px' }}
+                    >
+                      <option value="">-- All Years --</option>
+                      {['1st Year', '2nd Year', '3rd Year', '4th Year', '1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester'].map(y => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                  </div>
+
                   <select 
                     className={styles.formInput} 
                     value={selectedBatchId} 
                     onChange={e => setSelectedBatchId(e.target.value)}
-                    style={{ width: '100%', marginBottom: '0.5rem' }}
+                    style={{ width: '100%', marginBottom: '0.5rem', border: filteredBatches.length === 1 ? '2px solid #10b981' : '1px solid #e2e8f0' }}
                   >
-                    <option key="default" value="">-- Select Admission Batch --</option>
-                    {savedBatches.map(b => (
+                    <option key="default" value="">
+                      {filteredBatches.length === 0 ? '-- No Matching Batches --' : `-- Select Batch (${filteredBatches.length} found) --`}
+                    </option>
+                    {filteredBatches.map(b => (
                       <option key={b.id} value={b.id}>{b.name} ({b.total_students} students)</option>
                     ))}
                   </select>
@@ -965,7 +1032,7 @@ export default function SeatPlanPage() {
                       
                       const batchStudents = await getStudentsByBatch(selectedBatchId);
                       const parsed: Student[] = batchStudents.map(s => ({
-                        roll: s.tu_regd_no || s.id.slice(0,6).toUpperCase(), // Fallback to partial ID if no TU Regd
+                        roll: s.roll_no || s.tu_regd_no || s.id.slice(0,6).toUpperCase(), // Priority: Roll No > TU Regd > Fallback ID
                         name: s.name,
                         program: `${selectedProgram} ${selectedTerm}`,
                         major: selectedMajor || undefined

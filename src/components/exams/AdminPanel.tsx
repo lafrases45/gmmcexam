@@ -1283,6 +1283,8 @@ export default function AdminPanel({
                       <StepCard num={2} label="Subjects & Full/Pass Marks" status={`${existingMarks.length} subjects configured`} color="blue" action={() => setWizardStep(2)} actionLabel="Manage" />
                       <StepCard num={3} label="Routine & Examination Dates" status={routineData.length > 0 ? `${routineData.length} dated slots` : 'Schedule empty'} color={routineData.length > 0 ? 'green' : 'yellow'} action={() => setWizardStep(3)} actionLabel="Edit Schedule" />
                       <StepCard num={4} label="Student List & Seat Plan" status="Sync students from system" color="blue" action={() => window.location.href = '/admin/seat-plan'} actionLabel="Go to Seat Plan" />
+                      <StepCard num={5} label="Results Ledger" status="Generate institutional ledgers" color="blue" action={() => setWizardStep(5)} actionLabel="Manage Ledger" />
+                      <StepCard num={6} label="Analysis Reports" status="View marks & performance" color="blue" action={() => setWizardStep(6)} actionLabel="View Reports" />
                     </div>
                   </div>
 
