@@ -245,7 +245,7 @@ export default function StudentRegistry() {
       
       await saveNameKnowledge(knowledgeToSave)
       
-      toast.success(`Successfully created ${batchName} and updated knowledge base!`)
+      toast.success(`Successfully saved student records for ${batchName}!`)
       setTsvData('')
       setReviewData([])
       setIsReviewing(false)
@@ -455,9 +455,36 @@ export default function StudentRegistry() {
     if (!searchQuery) return sourceStudents
     return sourceStudents.filter(s => 
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      s.tu_regd_no.toLowerCase().includes(searchQuery.toLowerCase())
+      (s.roll_no && s.roll_no.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (s.tu_regd_no && s.tu_regd_no.toLowerCase().includes(searchQuery.toLowerCase()))
     )
   }, [sourceStudents, searchQuery])
+
+  const groupedBatches = useMemo(() => {
+    const groups: Record<string, any[]> = {}
+    batches.forEach((b: any) => {
+      let found = false
+      for (const p of PROGRAMS) {
+        if (b.name.toUpperCase().startsWith(p.toUpperCase())) {
+          if (!groups[p]) groups[p] = []
+          groups[p].push(b)
+          found = true
+          break
+        }
+      }
+      if (!found) {
+        if (!groups['Other']) groups['Other'] = []
+        groups['Other'].push(b)
+      }
+    })
+    // Sort keys based on PROGRAMS order
+    const sortedGroups: Record<string, any[]> = {}
+    PROGRAMS.forEach(p => {
+      if (groups[p]) sortedGroups[p] = groups[p]
+    })
+    if (groups['Other']) sortedGroups['Other'] = groups['Other']
+    return sortedGroups
+  }, [batches, PROGRAMS])
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '4rem' }}>
@@ -733,8 +760,8 @@ export default function StudentRegistry() {
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                       <thead style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 1 }}>
                         <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569' }}>Student Name</th>
-                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569' }}>Roll No</th>
+                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569', minWidth: '250px' }}>Student Name</th>
+                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569', minWidth: '130px' }}>Roll No</th>
                           <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569' }}>Gender (Verify)</th>
                           <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#475569' }}>Ethnic Group (Verify)</th>
                           {isBEd && <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: '#0369a1' }}>Section</th>}
@@ -749,14 +776,14 @@ export default function StudentRegistry() {
                               <input 
                                 value={row.name} 
                                 onChange={e => updateReviewRow(idx, 'name', e.target.value)}
-                                style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: 600, outline: 'none' }}
+                                style={{ width: '100%', minWidth: '240px', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: 600, outline: 'none' }}
                               />
                             </td>
                             <td style={{ padding: '0.75rem 1rem' }}>
                               <input 
                                 value={row.roll_no} 
                                 onChange={e => updateReviewRow(idx, 'roll_no', e.target.value)}
-                                style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#64748b', outline: 'none' }}
+                                style={{ width: '100%', minWidth: '110px', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#64748b', outline: 'none' }}
                               />
                             </td>
                             <td style={{ padding: '0.75rem 1rem' }}>
@@ -878,52 +905,68 @@ export default function StudentRegistry() {
                   <tr><td colSpan={5} style={{ padding: '4rem', textAlign: 'center', color: '#64748b' }}><RefreshCw className="animate-spin" style={{ margin: '0 auto 1rem' }} /> Loading batches...</td></tr>
                 ) : batches.length === 0 ? (
                   <tr><td colSpan={5} style={{ padding: '4rem', textAlign: 'center', color: '#64748b' }}>No student batches uploaded yet.</td></tr>
-                ) : batches.map((batch: any) => (
-                  <tr key={batch.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '1rem', fontWeight: 600, color: '#0f172a' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '0.4rem', borderRadius: '8px' }}>
-                          <GraduationCap size={16} />
-                        </div>
-                        {batch.name}
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem', color: '#475569', fontWeight: 500 }}>
-                      {batch.total_students}
-                    </td>
-                    <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem' }}>
-                      {new Date(batch.created_at).toLocaleDateString()}
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <Link href={`/admin/admission-analysis?batchId=${batch.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', background: '#fdf2f8', color: '#db2777', padding: '0.3rem 0.6rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 600 }}>
-                          <BarChart3 size={12} /> Analysis
-                        </Link>
-                        <Link href={`/admin/internal-exams`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', background: '#f0fdf4', color: '#16a34a', padding: '0.3rem 0.6rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 600 }}>
-                          <ClipboardList size={12} /> Setup Exam
-                        </Link>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                        <button 
-                          onClick={() => handleEditBatch(batch)}
-                          style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.4rem', borderRadius: '4px' }}
-                          title="Edit Batch"
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteBatch(batch.id, batch.name)}
-                          style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.4rem', borderRadius: '4px' }}
-                          title="Delete Batch"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                ) : (
+                  Object.entries(groupedBatches).map(([prog, progBatches]) => (
+                    <React.Fragment key={prog}>
+                      <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                        <td colSpan={5} style={{ padding: '0.6rem 1rem', background: '#f1f5f9' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div style={{ width: '8px', height: '18px', background: '#3b82f6', borderRadius: '4px' }}></div>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              {prog} Batches
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                      {progBatches.map((batch: any) => (
+                        <tr key={batch.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '1rem', fontWeight: 600, color: '#0f172a' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '0.4rem', borderRadius: '8px' }}>
+                                <GraduationCap size={16} />
+                              </div>
+                              {batch.name}
+                            </div>
+                          </td>
+                          <td style={{ padding: '1rem', color: '#475569', fontWeight: 500 }}>
+                            {batch.total_students}
+                          </td>
+                          <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem' }}>
+                            {new Date(batch.created_at).toLocaleDateString()}
+                          </td>
+                          <td style={{ padding: '1rem' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              <Link href={`/admin/admission-analysis?batchId=${batch.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', background: '#fdf2f8', color: '#db2777', padding: '0.3rem 0.6rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 600 }}>
+                                <BarChart3 size={12} /> Analysis
+                              </Link>
+                              <Link href={`/admin/internal-exams`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', background: '#f0fdf4', color: '#16a34a', padding: '0.3rem 0.6rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 600 }}>
+                                <ClipboardList size={12} /> Setup Exam
+                              </Link>
+                            </div>
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                              <button 
+                                onClick={() => handleEditBatch(batch)}
+                                style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.4rem', borderRadius: '4px' }}
+                                title="Edit Batch"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteBatch(batch.id, batch.name)}
+                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.4rem', borderRadius: '4px' }}
+                                title="Delete Batch"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

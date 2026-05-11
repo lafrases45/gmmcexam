@@ -20,48 +20,32 @@ export async function getBatches() {
 export async function createBatch(name: string, students: any[], appendMode = false) {
   const supabase = await createClient()
 
-  let batch: { id: string; total_students: number }
+  let batchId: string
 
-  if (appendMode) {
-    // B.Ed. mode: append students to existing batch if it exists
-    const { data: existing } = await supabase
-      .from('admission_batches')
-      .select('id, total_students')
-      .eq('name', name)
-      .maybeSingle()
+  // 1. Get or Create Batch
+  const { data: existing } = await supabase
+    .from('admission_batches')
+    .select('id')
+    .eq('name', name)
+    .maybeSingle()
 
-    if (existing) {
-      // Batch exists — just update the count
-      batch = existing
-      await supabase
-        .from('admission_batches')
-        .update({ total_students: (existing.total_students || 0) + students.length })
-        .eq('id', existing.id)
-    } else {
-      // No existing batch — create a new one
-      const { data: newBatch, error: batchError } = await supabase
-        .from('admission_batches')
-        .insert([{ name, total_students: students.length }])
-        .select()
-        .single()
-      if (batchError || !newBatch) throw new Error(batchError?.message || 'Failed to create batch')
-      batch = newBatch
-    }
+  if (existing) {
+    batchId = existing.id
   } else {
-    // Default mode: delete any existing batch with same name, then recreate
-    await supabase.from('admission_batches').delete().eq('name', name)
+    // Create a new batch if it doesn't exist
     const { data: newBatch, error: batchError } = await supabase
       .from('admission_batches')
       .insert([{ name, total_students: students.length }])
       .select()
       .single()
+    
     if (batchError || !newBatch) throw new Error(batchError?.message || 'Failed to create batch')
-    batch = newBatch
+    batchId = newBatch.id
   }
 
-  // 2. Insert students
+  // 2. Prepare student records
   const studentRecords = students.map(s => ({
-    batch_id: batch.id,
+    batch_id: batchId,
     name: s.name,
     gender: s.gender || 'Unknown',
     ethnic_group: s.ethnic_group || 'Unknown',
@@ -72,20 +56,33 @@ export async function createBatch(name: string, students: any[], appendMode = fa
     major: s.major || ''
   }))
 
+  // 3. Upsert students (replaces old data with new ones if roll_no matches)
   const { error: studentError } = await supabase
     .from('admission_students')
-    .insert(studentRecords)
+    .upsert(studentRecords, { onConflict: 'roll_no' })
 
   if (studentError) {
-    // Rollback batch if students fail
-    await supabase.from('admission_batches').delete().eq('id', batch.id)
     throw new Error(studentError.message)
+  }
+
+  // 4. Recalculate total students for the batch to ensure accuracy
+  const { count, error: countError } = await supabase
+    .from('admission_students')
+    .select('*', { count: 'exact', head: true })
+    .eq('batch_id', batchId)
+
+  if (!countError) {
+    await supabase
+      .from('admission_batches')
+      .update({ total_students: count || 0 })
+      .eq('id', batchId)
   }
 
   revalidatePath('/admin/students')
   revalidatePath('/admin/admission-analysis')
-  return batch
+  return { id: batchId }
 }
+
 
 export async function deleteBatch(id: string) {
   const supabase = await createClient()

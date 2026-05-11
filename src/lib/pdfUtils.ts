@@ -1017,3 +1017,204 @@ export async function createMasterRoutinePDF(
 
   return await pdfDoc.save();
 }
+
+// ─── PROGRAM STATISTICS PDF ────────────────────────────────────────────────────
+export async function createProgramStatsPDF(
+  programLabel: string,
+  tableData: Record<string, Record<string, { male: number; female: number }>>,
+  activeBatches: string[],
+  ethnicCategories: string[],
+  totalStudents: number
+) {
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  // Landscape A4 for wide cross-tab table
+  const PAGE_W = 842;
+  const PAGE_H = 595;
+  const page = pdfDoc.addPage([PAGE_W, PAGE_H]);
+
+  let y = PAGE_H - 35;
+
+  // ── 1. Campus Letterhead ──────────────────────────────────────────────────────
+  const title1 = 'GUPTESHWOR MAHADEV MULTIPLE CAMPUS';
+  const t1w = boldFont.widthOfTextAtSize(title1, 16);
+  page.drawText(title1, { x: (PAGE_W - t1w) / 2, y, size: 16, font: boldFont });
+  y -= 18;
+
+  const title2 = 'Chhorepatan-17, Pokhara | Gandaki Province, Nepal';
+  const t2w = font.widthOfTextAtSize(title2, 10);
+  page.drawText(title2, { x: (PAGE_W - t2w) / 2, y, size: 10, font });
+  y -= 14;
+
+  const title3 = 'Department of Student Affairs';
+  const t3w = boldFont.widthOfTextAtSize(title3, 12);
+  page.drawText(title3, { x: (PAGE_W - t3w) / 2, y, size: 12, font: boldFont });
+  y -= 8;
+
+  // Underline
+  page.drawLine({
+    start: { x: (PAGE_W - t3w) / 2, y },
+    end: { x: (PAGE_W + t3w) / 2, y },
+    thickness: 1,
+  });
+  y -= 18;
+
+  // ── 2. Report Title ───────────────────────────────────────────────────────────
+  const reportTitle = `${programLabel} Ethnic Report (Demographics)`;
+  const rtw = boldFont.widthOfTextAtSize(reportTitle, 13);
+  page.drawText(reportTitle, { x: (PAGE_W - rtw) / 2, y, size: 13, font: boldFont });
+  y -= 12;
+
+  const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+  const dateStr = `Date: ${today}   |   Total Active Students: ${totalStudents}`;
+  const dsw = font.widthOfTextAtSize(dateStr, 9);
+  page.drawText(dateStr, { x: (PAGE_W - dsw) / 2, y, size: 9, font });
+  y -= 20;
+
+  // ── 3. Cross-Tab Table ────────────────────────────────────────────────────────
+  const LEFT_MARGIN = 30;
+  const TABLE_RIGHT = PAGE_W - 30;
+  const yearColW = 120;
+  const numEthnic = ethnicCategories.length;
+  // Each ethnic category has 2 sub-cols (M + F), plus 3 grand total cols (M, F, T)
+  const totalCols = numEthnic * 2 + 3;
+  const remainingWidth = TABLE_RIGHT - LEFT_MARGIN - yearColW;
+  const subColW = remainingWidth / totalCols;
+
+  const ROW_H = 18;
+  const HEADER_H1 = 20; // ethnic category header
+  const HEADER_H2 = 16; // M/F sub-header
+
+  // ── Header Row 1: "Year/Level" + Ethnic Categories + "Grand Total" ─────────
+  let x = LEFT_MARGIN;
+  const headerTop = y;
+
+  // Batch / Level cell (rowspan 2 visually)
+  page.drawRectangle({ x, y: y - HEADER_H1 - HEADER_H2, width: yearColW, height: HEADER_H1 + HEADER_H2, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+  const ylLabel = 'Batch / Level';
+  const ylw = boldFont.widthOfTextAtSize(ylLabel, 8);
+  page.drawText(ylLabel, { x: x + (yearColW - ylw) / 2, y: y - HEADER_H1 / 2 - 3, size: 8, font: boldFont, color: rgb(0, 0, 0) });
+  x += yearColW;
+
+  // Ethnic category headers
+  ethnicCategories.forEach(cat => {
+    page.drawRectangle({ x, y: y - HEADER_H1, width: subColW * 2, height: HEADER_H1, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+    const cw = boldFont.widthOfTextAtSize(cat, 8);
+    page.drawText(cat, { x: x + (subColW * 2 - cw) / 2, y: y - 13, size: 8, font: boldFont, color: rgb(0, 0, 0) });
+    x += subColW * 2;
+  });
+
+  // Total header
+  page.drawRectangle({ x, y: y - HEADER_H1, width: subColW * 3, height: HEADER_H1, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+  const gtLabel = 'Total';
+  const gtlw = boldFont.widthOfTextAtSize(gtLabel, 8);
+  page.drawText(gtLabel, { x: x + (subColW * 3 - gtlw) / 2, y: y - 13, size: 8, font: boldFont, color: rgb(0, 0, 0) });
+
+  y -= HEADER_H1;
+
+  // ── Header Row 2: M / F sub-headers ──────────────────────────────────────────
+  x = LEFT_MARGIN + yearColW;
+  ethnicCategories.forEach(() => {
+    ['M', 'F'].forEach(label => {
+      page.drawRectangle({ x, y: y - HEADER_H2, width: subColW, height: HEADER_H2, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+      const lw = boldFont.widthOfTextAtSize(label, 8);
+      page.drawText(label, { x: x + (subColW - lw) / 2, y: y - 13, size: 8, font: boldFont, color: rgb(0, 0, 0) });
+      x += subColW;
+    });
+  });
+  ['M', 'F', 'T'].forEach(label => {
+    page.drawRectangle({ x, y: y - HEADER_H2, width: subColW, height: HEADER_H2, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+    const lw = boldFont.widthOfTextAtSize(label, 8);
+    page.drawText(label, { x: x + (subColW - lw) / 2, y: y - 13, size: 8, font: boldFont, color: rgb(0, 0, 0) });
+    x += subColW;
+  });
+
+  y -= HEADER_H2;
+
+  // ── Data Rows ─────────────────────────────────────────────────────────────────
+  activeBatches.forEach((batch) => {
+    x = LEFT_MARGIN;
+
+    // Year label cell
+    page.drawRectangle({ x, y: y - ROW_H, width: yearColW, height: ROW_H, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+    page.drawText(batch, { x: x + 4, y: y - 12, size: 8, font: boldFont, color: rgb(0, 0, 0) });
+    x += yearColW;
+
+    let rowTotalM = 0;
+    let rowTotalF = 0;
+
+    ethnicCategories.forEach(cat => {
+      const m = tableData[batch]?.[cat]?.male || 0;
+      const f = tableData[batch]?.[cat]?.female || 0;
+      rowTotalM += m;
+      rowTotalF += f;
+
+      [m, f].forEach(val => {
+        page.drawRectangle({ x, y: y - ROW_H, width: subColW, height: ROW_H, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+        if (val > 0) {
+          const vw = font.widthOfTextAtSize(String(val), 9);
+          page.drawText(String(val), { x: x + (subColW - vw) / 2, y: y - 12, size: 9, font, color: rgb(0, 0, 0) });
+        }
+        x += subColW;
+      });
+    });
+
+    // Grand Total M, F, T
+    [rowTotalM, rowTotalF, rowTotalM + rowTotalF].forEach((val) => {
+      page.drawRectangle({ x, y: y - ROW_H, width: subColW, height: ROW_H, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+      const vw = boldFont.widthOfTextAtSize(String(val), 9);
+      page.drawText(String(val), { x: x + (subColW - vw) / 2, y: y - 12, size: 9, font: boldFont, color: rgb(0, 0, 0) });
+      x += subColW;
+    });
+
+    y -= ROW_H;
+  });
+
+  // ── Footer / Grand Total Row ────────────────────────────────────────────────
+  x = LEFT_MARGIN;
+  page.drawRectangle({ x, y: y - ROW_H, width: yearColW, height: ROW_H, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+  page.drawText('Grand Total', { x: x + 4, y: y - 12, size: 8, font: boldFont, color: rgb(0, 0, 0) });
+  x += yearColW;
+
+  let grandM = 0;
+  let grandF = 0;
+
+  ethnicCategories.forEach(cat => {
+    let colM = 0;
+    let colF = 0;
+    activeBatches.forEach(b => {
+      colM += tableData[b]?.[cat]?.male || 0;
+      colF += tableData[b]?.[cat]?.female || 0;
+    });
+    grandM += colM;
+    grandF += colF;
+
+    [colM, colF].forEach(val => {
+      page.drawRectangle({ x, y: y - ROW_H, width: subColW, height: ROW_H, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+      const vw = boldFont.widthOfTextAtSize(String(val), 9);
+      page.drawText(String(val), { x: x + (subColW - vw) / 2, y: y - 12, size: 9, font: boldFont, color: rgb(0, 0, 0) });
+      x += subColW;
+    });
+  });
+
+  // Grand Grand Total
+  [grandM, grandF, grandM + grandF].forEach((val) => {
+    page.drawRectangle({ x, y: y - ROW_H, width: subColW, height: ROW_H, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+    const vw = boldFont.widthOfTextAtSize(String(val), 10);
+    page.drawText(String(val), { x: x + (subColW - vw) / 2, y: y - 12, size: 10, font: boldFont, color: rgb(0, 0, 0) });
+    x += subColW;
+  });
+
+  y -= ROW_H + 30;
+
+  // ── Signature ─────────────────────────────────────────────────────────────────
+  const sigText = 'Principal / Exam Coordinator';
+  const sigW = boldFont.widthOfTextAtSize(sigText, 10);
+  const sigX = TABLE_RIGHT - sigW - 10;
+  page.drawText('......................................', { x: sigX - 40, y: y + 15, size: 10, font });
+  page.drawText(sigText, { x: sigX, y, size: 10, font: boldFont });
+
+  return await pdfDoc.save();
+}

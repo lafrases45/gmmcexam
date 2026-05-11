@@ -81,6 +81,7 @@ export default function AdminLayout({
       { name: 'Admission Analysis', icon: Activity, href: '/admin/admission-analysis' },
       { name: 'Exam Reports', icon: BarChart3, href: '/admin/internal-exams?tab=report' },
       { name: 'Marks Reports', icon: Activity, href: '/admin/reports' },
+      { name: 'Program Statistics', icon: BarChart3, href: '/admin/program-stats' },
       { name: 'Analytics', icon: BarChart3, href: '/admin/analytics' },
     ]},
     { category: 'SYSTEM', items: [
