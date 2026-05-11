@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
@@ -15,10 +15,29 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+export const viewport: Viewport = {
+  themeColor: '#3b82f6',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
-  title: "Gupteshwor Mahadev Multiple Campus | GMMC",
-  description: "Official website of Gupteshwor Mahadev Multiple Campus, Pokhara. Providing quality education in Management and Education.",
-  keywords: ["GMMC", "Gupteshwor Mahadev Multiple Campus", "Pokhara", "Tribhuvan University", "BBS", "BITM", "MBS", "BHM"],
+  title: "GMMC EMIS | Exam & Student Management",
+  description: "Official Student and Exam Information System of Gupteshwor Mahadev Multiple Campus.",
+  keywords: ["GMMC", "Gupteshwor Mahadev Multiple Campus", "Pokhara", "EMIS", "Exam Management"],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "GMMC EMIS",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    apple: "/images/logo.png",
+  },
 };
 
 export default function RootLayout({
