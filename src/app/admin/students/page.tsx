@@ -72,7 +72,7 @@ export default function StudentRegistry() {
   const [selectedAcadYear, setSelectedAcadYear] = useState('2082')
   const [selectedSec, setSelectedSec] = useState('A')
   
-  const PROGRAMS = ['BTIM', 'BHM', 'BIM', 'MBS', 'BBS', 'B.Ed.']
+  const PROGRAMS = ['BITM', 'BIM', 'BHM', 'MBS', 'BBS', 'B.Ed.']
   const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester']
   const SECTIONS = ['A', 'B']
 
@@ -128,28 +128,20 @@ export default function StudentRegistry() {
       }
     })
 
-    // --- Deduplication: remove duplicate roll_no and duplicate names ---
+    // --- Deduplication: remove duplicate roll_no only ---
     const seenRollNos = new Set<string>()
-    const seenNames = new Set<string>()
     const duplicatesRemoved: string[] = []
 
     const deduplicated = processed.filter(row => {
       const rollKey = (row.roll_no || '').trim().toLowerCase()
-      const nameKey = (row.name || '').trim().toLowerCase()
 
       // Check roll_no duplicate (only if roll_no is non-empty)
       if (rollKey && seenRollNos.has(rollKey)) {
         duplicatesRemoved.push(`${row.name} (Roll: ${row.roll_no})`)
         return false
       }
-      // Check name duplicate
-      if (nameKey && seenNames.has(nameKey)) {
-        duplicatesRemoved.push(`${row.name} (duplicate name)`)
-        return false
-      }
 
       if (rollKey) seenRollNos.add(rollKey)
-      if (nameKey) seenNames.add(nameKey)
       return true
     })
 
@@ -521,20 +513,30 @@ export default function StudentRegistry() {
             <div className="animate-in slide-in-from-top-4 duration-300" style={{ background: 'white', padding: '1.5rem', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '2rem', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
               
               {/* Batch Configuration */}
-              <div style={{ padding: '1rem', background: '#f0f9ff', borderRadius: '12px', border: '1px solid #bae6fd', marginBottom: '1.5rem', display: 'flex', gap: '1.5rem', alignItems: 'flex-end' }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ 
+                padding: '1rem', 
+                background: '#f0f9ff', 
+                borderRadius: '12px', 
+                border: '1px solid #bae6fd', 
+                marginBottom: '1.5rem', 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                gap: '1rem', 
+                alignItems: 'flex-end' 
+              }}>
+                <div>
                   <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 700, fontSize: '0.8rem', color: '#0369a1' }}>Program</label>
                   <select value={selectedProg} onChange={e => setSelectedProg(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #7dd3fc', outline: 'none', background: 'white' }}>
                     {PROGRAMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
-                <div style={{ flex: 1 }}>
+                <div>
                   <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 700, fontSize: '0.8rem', color: '#0369a1' }}>Year/Semester</label>
                   <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #7dd3fc', outline: 'none', background: 'white' }}>
                     {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
                   </select>
                 </div>
-                <div style={{ flex: 1 }}>
+                <div>
                   <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 700, fontSize: '0.8rem', color: '#0369a1' }}>Batch (Year)</label>
                   <input 
                     type="number" 
@@ -544,7 +546,7 @@ export default function StudentRegistry() {
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '8px', border: '1px solid #7dd3fc', outline: 'none', background: 'white' }} 
                   />
                 </div>
-                <div style={{ flex: 1 }}>
+                <div>
                   <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 700, fontSize: '0.8rem', color: '#0369a1' }}>Section</label>
                   <select value={selectedSec} onChange={e => setSelectedSec(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #7dd3fc', outline: 'none', background: 'white' }}>
                     {SECTIONS.map(s => (
@@ -555,7 +557,7 @@ export default function StudentRegistry() {
                   </select>
                 </div>
                 {isBEd && (
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', paddingBottom: '0.1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '0.1rem' }}>
                     <div style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: '8px', background: selectedSec === 'A' ? '#eff6ff' : '#fdf4ff', border: `1px solid ${selectedSec === 'A' ? '#93c5fd' : '#d8b4fe'}`, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <span style={{ fontSize: '1rem' }}>{selectedSec === 'A' ? '🇬🇧' : '🇳🇵'}</span>
                       <span style={{ fontSize: '0.82rem', fontWeight: 700, color: selectedSec === 'A' ? '#1d4ed8' : '#7c3aed' }}>
@@ -564,7 +566,7 @@ export default function StudentRegistry() {
                     </div>
                   </div>
                 )}
-                <div style={{ flex: 2, background: 'white', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px dashed #0369a1', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', minHeight: '40px' }}>
+                <div style={{ gridColumn: '1 / -1', background: 'white', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px dashed #0369a1', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', minHeight: '40px' }}>
                   <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Batch:</span>
                   <strong style={{ fontSize: '0.9rem', color: '#0c4a6e' }}>{batchName}</strong>
                   {isBEd && (
@@ -975,7 +977,7 @@ export default function StudentRegistry() {
         <div className="animate-in fade-in duration-500">
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '2rem', color: '#1e293b' }}>Semester Update</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem', marginBottom: '3rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
             {/* Current Status Card */}
             <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)', overflow: 'hidden' }}>
               <div style={{ padding: '1rem 1.5rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
@@ -1116,8 +1118,8 @@ export default function StudentRegistry() {
                 </div>
               </div>
 
-              <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: 'white', zIndex: 1 }}>
                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                       <th style={{ padding: '0.75rem 1rem', width: '40px' }}></th>

@@ -3,12 +3,13 @@ import { useEffect, useState, Fragment } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ArrowLeft, GraduationCap, Printer, RefreshCw, Download, FileText } from 'lucide-react';
+import reportStyles from './report.module.css';
 
 const PROGRAM_GROUPS = [
   { id: 'bbs',      label: 'BBS',       prefixes: ['BBS'],         color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
   { id: 'bed',      label: 'B.Ed.',     prefixes: ['B.ED.', 'B.ED', 'BED'], color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0' },
   { id: 'bhm',      label: 'BHM',       prefixes: ['BHM'],         color: '#f59e0b', bg: '#fffbeb', border: '#fde68a' },
-  { id: 'bim-bitm', label: 'BIM/BITM',  prefixes: ['BITM', 'BIM'], color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe' },
+  { id: 'bim-bitm', label: 'BIM/BITM', prefixes: ['BITM', 'BIM'], color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe' },
   { id: 'mbs',      label: 'MBS',       prefixes: ['MBS'],         color: '#ec4899', bg: '#fdf2f8', border: '#fbcfe8' },
 ];
 
@@ -16,18 +17,24 @@ const YEAR_ORDER = [
   '1st Year','2nd Year','3rd Year','4th Year',
   '1st Semester','2nd Semester','3rd Semester','4th Semester',
   '5th Semester','6th Semester','7th Semester','8th Semester',
+  '1st Sem','2nd Sem','3rd Sem','4th Sem',
+  '5th Sem','6th Sem','7th Sem','8th Sem',
 ];
 
 const ETHNIC_CATEGORIES = ['Dalit','EDJ','Janajati','Madhesi','Other'];
 
 function matchesGroup(batchName: string, prefixes: string[]): boolean {
   const upper = batchName.toUpperCase().trim();
-  return prefixes.some(p => upper.startsWith(p.toUpperCase() + ' ') || upper === p.toUpperCase());
+  return prefixes.some(p => {
+    const up = p.toUpperCase();
+    return upper.startsWith(up + ' ') || upper.startsWith(up + '-') || upper === up;
+  });
 }
 
 function extractYear(batchName: string): string {
+  const upper = batchName.toUpperCase();
   for (const y of YEAR_ORDER) {
-    if (batchName.includes(y)) return y;
+    if (upper.includes(y.toUpperCase())) return y;
   }
   return 'Other';
 }
@@ -209,17 +216,19 @@ export default function ProgramStatsDetail() {
     }
   };
 
+
+
   return (
     <>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '4rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div className={reportStyles.container}>
+        <div className={reportStyles.topHeader}>
           <button 
             onClick={() => router.back()} 
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontWeight: 600, padding: '0.5rem' }}
           >
             <ArrowLeft size={20} /> Back
           </button>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className={reportStyles.buttonGroup}>
             <button 
               onClick={handleDownloadPDF} 
               disabled={isDownloading || isLoading || students.length === 0}
@@ -237,7 +246,7 @@ export default function ProgramStatsDetail() {
           </div>
         </div>
 
-        <div id="printable-report" style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)', overflowX: 'auto' }}>
+        <div id="printable-report" className={reportStyles.reportCard}>
           
           {/* Print-Only Campus Header */}
           <div className="print-only-header" style={{ display: 'none', textAlign: 'center', marginBottom: '2rem' }}>
@@ -247,7 +256,7 @@ export default function ProgramStatsDetail() {
             <div style={{ borderBottom: '2px solid #000', width: '100%' }}></div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '2px solid #f1f5f9' }} className="report-title-section">
+          <div className={reportStyles.reportTitleSection}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: '#0f172a' }}>{selectedGroup.label} Ethnic Report (Demographics)</h1>
             <p style={{ fontSize: '0.9rem', color: '#64748b', margin: 0 }}>Total Active Students: <strong style={{ color: selectedGroup.color, fontSize: '1.1rem' }}>{students.length}</strong></p>
           </div>
@@ -260,7 +269,7 @@ export default function ProgramStatsDetail() {
           ) : students.length === 0 ? (
             <div style={{ padding: '4rem', textAlign: 'center', color: '#94a3b8', fontSize: '1.1rem' }}>No student records found for {selectedGroup.label}.</div>
           ) : (
-            <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden' }}>
+            <div className={reportStyles.tableWrapper} style={{ border: '1px solid #e2e8f0', borderRadius: '12px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '900px' }}>
                 <thead>
                   <tr>

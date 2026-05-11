@@ -37,12 +37,17 @@ export default function AdminDashboard() {
     '1st Year','2nd Year','3rd Year','4th Year',
     '1st Semester','2nd Semester','3rd Semester','4th Semester',
     '5th Semester','6th Semester','7th Semester','8th Semester',
+    '1st Sem','2nd Sem','3rd Sem','4th Sem',
+    '5th Sem','6th Sem','7th Sem','8th Sem',
   ];
   const ETHNIC_CATEGORIES = ['Dalit','EDJ','Janajati','Madhesi','Other'];
 
   function matchesGroup(batchName: string, prefixes: string[]): boolean {
     const upper = batchName.toUpperCase().trim();
-    return prefixes.some(p => upper.startsWith(p.toUpperCase() + ' ') || upper === p.toUpperCase());
+    return prefixes.some(p => {
+      const up = p.toUpperCase();
+      return upper.startsWith(up + ' ') || upper.startsWith(up + '-') || upper === up;
+    });
   }
 
   function extractYear(batchName: string): string {
