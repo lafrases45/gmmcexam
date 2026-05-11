@@ -13,7 +13,8 @@ import {
   Layout, ClipboardList, Users, BookOpen, 
   Plus, Search, ArrowRight, Clock, Calendar, 
   CheckSquare, TrendingUp, Database, Shield,
-  ArrowUpRight, MoreHorizontal, Activity, GraduationCap
+  ArrowUpRight, MoreHorizontal, Activity, GraduationCap,
+  Download, Upload
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -397,10 +398,93 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
+      {/* 4. System Maintenance Section */}
+      <section style={{ marginBottom: '3rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Database size={24} color="#6366f1" /> System Maintenance
+          </h2>
+        </div>
+        
+        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            {/* Backup Card */}
+            <div style={{ borderRight: '1px solid #f1f5f9', paddingRight: '1rem' }}>
+              <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>System Backup</h3>
+              <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.875rem', color: '#64748b', lineHeight: 1.5 }}>
+                Export all system data including student registries, exam results, teacher assignments, and knowledge base heuristics into a single JSON file.
+              </p>
+              <button 
+                onClick={handleBackup}
+                disabled={isBackingUp}
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '0.75rem', 
+                  padding: '0.75rem 1.5rem', 
+                  background: '#6366f1', 
+                  color: 'white', 
+                  borderRadius: '10px', 
+                  border: 'none', 
+                  fontWeight: 600, 
+                  cursor: isBackingUp ? 'not-allowed' : 'pointer',
+                  opacity: isBackingUp ? 0.7 : 1,
+                  transition: 'all 0.2s'
+                }}
+                className="hover:bg-indigo-700 active:scale-95"
+              >
+                {isBackingUp ? <RefreshCw size={18} className="animate-spin" /> : <Download size={18} />}
+                {isBackingUp ? 'Generating Backup...' : 'Download System Backup'}
+              </button>
+            </div>
+
+            {/* Restore Card */}
+            <div>
+              <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#ef4444' }}>System Recovery</h3>
+              <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.875rem', color: '#64748b', lineHeight: 1.5 }}>
+                Restore the entire system from a previous backup file. <strong style={{ color: '#ef4444' }}>Warning: This will overwrite all current data in the database.</strong>
+              </p>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="file" 
+                  accept=".json" 
+                  onChange={handleRestore}
+                  disabled={isRestoring}
+                  style={{ 
+                    position: 'absolute', 
+                    inset: 0, 
+                    opacity: 0, 
+                    cursor: isRestoring ? 'not-allowed' : 'pointer',
+                    width: '100%',
+                    height: '100%'
+                  }}
+                />
+                <button 
+                  disabled={isRestoring}
+                  style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.75rem', 
+                    padding: '0.75rem 1.5rem', 
+                    background: '#fef2f2', 
+                    color: '#ef4444', 
+                    border: '1px solid #fee2e2',
+                    borderRadius: '10px', 
+                    fontWeight: 600, 
+                    pointerEvents: 'none'
+                  }}
+                >
+                  {isRestoring ? <RefreshCw size={18} className="animate-spin" /> : <Upload size={18} />}
+                  {isRestoring ? 'Restoring System...' : 'Upload & Restore System'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
   );
 }
-

@@ -50,12 +50,12 @@ export default function BoardExamsAdmin() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-end mb-8 border-b pb-6">
+      <div className="flex flex-wrap justify-between items-end mb-8 border-b pb-6 gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Exam Management System</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Exam Management System</h1>
           <p className="text-blue-600 font-bold mt-1 text-lg">Board Exam Management System</p>
         </div>
-        <Link href="/board-exam/upload" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+        <Link href="/board-exam/upload" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg hover:-translate-y-0.5 active:translate-y-0 w-full md:w-auto text-center">
           + Add Board Exam
         </Link>
       </div>
@@ -66,15 +66,15 @@ export default function BoardExamsAdmin() {
           <p className="mt-4 text-gray-500">Loading records...</p>
         </div>
       ) : exams.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed">
+        <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed px-4">
           <p className="text-gray-500 text-lg">No board exam records found.</p>
           <Link href="/board-exam/upload" className="text-blue-600 font-medium hover:underline mt-2 inline-block">
             Upload your first PDF to get started
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-md border overflow-hidden">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-white rounded-xl shadow-md border overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-gray-50 border-b">
                 <th className="px-6 py-4 font-bold text-gray-700">Exam Details</th>

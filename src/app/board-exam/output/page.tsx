@@ -91,9 +91,14 @@ function OutputContent() {
             <p className="text-sm text-green-700">Your mark ledgers and result report are ready for download.</p>
           </div>
         </div>
-        <button onClick={handleStartNew} className="px-5 py-2.5 bg-white border border-green-200 text-green-800 font-medium rounded-lg hover:bg-green-50 transition shadow-sm">
-          Start New Exam
-        </button>
+        <div className="flex gap-3">
+          <button onClick={() => router.push('/admin')} className="px-5 py-2.5 bg-gray-100 border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition shadow-sm">
+            Back to Dashboard
+          </button>
+          <button onClick={handleStartNew} className="px-5 py-2.5 bg-white border border-green-200 text-green-800 font-medium rounded-lg hover:bg-green-50 transition shadow-sm">
+            Start New Exam
+          </button>
+        </div>
       </div>
 
       {/* Download Cards */}

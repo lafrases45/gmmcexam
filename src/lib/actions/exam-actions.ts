@@ -884,7 +884,8 @@ export async function exportSystemData() {
     { data: admission_students },
     { data: seat_plans },
     { data: online_admissions },
-    { data: notices }
+    { data: notices },
+    { data: name_knowledge_base }
   ] = await Promise.all([
     supabase.from('exams').select('*'),
     supabase.from('subjects').select('*'),
@@ -899,7 +900,8 @@ export async function exportSystemData() {
     supabase.from('admission_students').select('*'),
     supabase.from('seat_plans').select('*'),
     supabase.from('online_admissions').select('*'),
-    supabase.from('notices').select('*')
+    supabase.from('notices').select('*'),
+    supabase.from('name_knowledge_base').select('*')
   ])
 
   return {
@@ -919,7 +921,8 @@ export async function exportSystemData() {
       admission_students: admission_students || [],
       seat_plans: seat_plans || [],
       online_admissions: online_admissions || [],
-      notices: notices || []
+      notices: notices || [],
+      name_knowledge_base: name_knowledge_base || []
     }
   }
 }
@@ -943,6 +946,7 @@ export async function restoreSystemData(backup: any) {
     await supabase.from('board_exams').delete().neq('id', '00000000-0000-0000-0000-000000000000')
     await supabase.from('online_admissions').delete().neq('id', '00000000-0000-0000-0000-000000000000')
     await supabase.from('notices').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('name_knowledge_base').delete().neq('id', '00000000-0000-0000-0000-000000000000')
 
     // 2. Restore in order of dependencies
     if (data.subjects?.length) await supabase.from('subjects').insert(data.subjects)
@@ -960,6 +964,7 @@ export async function restoreSystemData(backup: any) {
     if (data.board_exams?.length) await supabase.from('board_exams').insert(data.board_exams)
     if (data.online_admissions?.length) await supabase.from('online_admissions').insert(data.online_admissions)
     if (data.notices?.length) await supabase.from('notices').insert(data.notices)
+    if (data.name_knowledge_base?.length) await supabase.from('name_knowledge_base').insert(data.name_knowledge_base)
 
     revalidatePath('/admin', 'layout')
     return { success: true }
