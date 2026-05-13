@@ -65,6 +65,9 @@ export async function addScholarship(data: {
   percentage?: number;
   is_waiver?: boolean;
   amount: number;
+  remarks?: string;
+  semester_or_year?: string;
+  scholarship_type?: string;
 }) {
   const supabase = await createClient();
   const { error } = await supabase.from('scholarships').insert(data);

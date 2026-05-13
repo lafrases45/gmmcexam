@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState, Fragment, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ArrowLeft, GraduationCap, Printer, RefreshCw, Download, FileText } from 'lucide-react';
@@ -59,6 +59,9 @@ function normalizeBatchName(name: string): string {
   return normalized;
 }
 
+const thStyle: React.CSSProperties = { padding: '0.75rem', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', background: '#f8fafc', color: '#475569', borderRight: '1px solid #e2e8f0' };
+const tdStyle: React.CSSProperties = { padding: '0.75rem', fontSize: '0.9rem', fontWeight: 600, borderBottom: '1px solid #f1f5f9', color: '#1e293b', borderRight: '1px solid #e2e8f0' };
+
 export default function ProgramStatsDetail() {
   const params = useParams();
   const router = useRouter();
@@ -98,40 +101,41 @@ export default function ProgramStatsDetail() {
     fetchData();
   }, [slug, selectedGroup, router]);
 
+  // Memoize Cross-Tabulation Data Structure to prevent heavy processing on every render
+  const { tableData, activeBatches } = useMemo(() => {
+    const data: Record<string, Record<string, { male: number; female: number }>> = {};
+    
+    // Group students by normalized batch name to merge sections/majors
+    students.forEach(s => {
+      const b = normalizeBatchName(s.batchName);
+      const e = ETHNIC_CATEGORIES.includes(s.ethnic_group) ? s.ethnic_group : 'Other';
+      
+      if (!data[b]) {
+         data[b] = {};
+         ETHNIC_CATEGORIES.forEach(cat => data[b][cat] = { male: 0, female: 0 });
+      }
+
+      if (isGenderMale(s.gender)) data[b][e].male++;
+      else if (isGenderFemale(s.gender)) data[b][e].female++;
+    });
+
+    // Get active batches and sort them logically
+    const sortedBatches = Object.keys(data).sort((a, b) => {
+      const yearA = extractYear(a);
+      const yearB = extractYear(b);
+      const indexA = YEAR_ORDER.indexOf(yearA);
+      const indexB = YEAR_ORDER.indexOf(yearB);
+      
+      if (indexA !== indexB) return indexA - indexB;
+
+      // If same year/semester, sort by name (usually contains year like 2082)
+      return b.localeCompare(a); 
+    });
+
+    return { tableData: data, activeBatches: sortedBatches };
+  }, [students]);
+
   if (!selectedGroup) return null;
-
-  // Cross-Tabulation Data Structure
-  const tableData: Record<string, Record<string, { male: number; female: number }>> = {};
-  
-  // Group students by normalized batch name to merge sections/majors
-  students.forEach(s => {
-    const b = normalizeBatchName(s.batchName);
-    const e = ETHNIC_CATEGORIES.includes(s.ethnic_group) ? s.ethnic_group : 'Other';
-    
-    if (!tableData[b]) {
-       tableData[b] = {};
-       ETHNIC_CATEGORIES.forEach(cat => tableData[b][cat] = { male: 0, female: 0 });
-    }
-
-    if (isGenderMale(s.gender)) tableData[b][e].male++;
-    else if (isGenderFemale(s.gender)) tableData[b][e].female++;
-  });
-
-  // Get active batches and sort them logically
-  const activeBatches = Object.keys(tableData).sort((a, b) => {
-    const yearA = extractYear(a);
-    const yearB = extractYear(b);
-    const indexA = YEAR_ORDER.indexOf(yearA);
-    const indexB = YEAR_ORDER.indexOf(yearB);
-    
-    if (indexA !== indexB) return indexA - indexB;
-
-    // If same year/semester, sort by name (usually contains year like 2082)
-    return b.localeCompare(a); 
-  });
-
-  const thStyle: React.CSSProperties = { padding: '0.75rem', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', background: '#f8fafc', color: '#475569', borderRight: '1px solid #e2e8f0' };
-  const tdStyle: React.CSSProperties = { padding: '0.75rem', fontSize: '0.9rem', fontWeight: 600, borderBottom: '1px solid #f1f5f9', color: '#1e293b', borderRight: '1px solid #e2e8f0' };
 
   const handlePrint = () => {
     const printContent = document.getElementById('printable-report');
@@ -215,8 +219,6 @@ export default function ProgramStatsDetail() {
       setIsDownloading(false);
     }
   };
-
-
 
   return (
     <>

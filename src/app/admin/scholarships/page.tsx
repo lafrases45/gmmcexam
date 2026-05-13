@@ -20,7 +20,9 @@ export default function ScholarshipManagementPage() {
     percentage: 100,
     is_waiver: false,
     amount: 0,
-    remarks: ''
+    remarks: '',
+    semester_or_year: '1st Year',
+    scholarship_type: 'Merit'
   });
 
   const supabase = createClient();
@@ -39,6 +41,8 @@ export default function ScholarshipManagementPage() {
         percentage,
         is_waiver,
         fiscal_year,
+        semester_or_year,
+        scholarship_type,
         admission_students (
           name,
           roll_no,
@@ -171,7 +175,7 @@ export default function ScholarshipManagementPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-slate-400 mb-2">Type</label>
+                  <label className="block text-xs font-bold uppercase text-slate-400 mb-2">Benefit Type</label>
                   <select 
                     value={formData.is_waiver ? 'waiver' : 'percentage'}
                     onChange={(e) => setFormData({ ...formData, is_waiver: e.target.value === 'waiver' })}
@@ -193,6 +197,33 @@ export default function ScholarshipManagementPage() {
                     </select>
                   </div>
                 )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-slate-400 mb-2">Scholarship Category</label>
+                  <select 
+                    value={formData.scholarship_type}
+                    onChange={(e) => setFormData({ ...formData, scholarship_type: e.target.value })}
+                    className="w-full border-2 border-slate-100 rounded-xl px-3 py-2.5 outline-none focus:border-blue-500"
+                  >
+                    <option value="Intelligent">Intelligent (Merit)</option>
+                    <option value="Reservation">Reservation</option>
+                    <option value="Inclusive">Inclusive</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-slate-400 mb-2">Sem / Year</label>
+                  <select 
+                    value={formData.semester_or_year}
+                    onChange={(e) => setFormData({ ...formData, semester_or_year: e.target.value })}
+                    className="w-full border-2 border-slate-100 rounded-xl px-3 py-2.5 outline-none focus:border-blue-500"
+                  >
+                    {['1st Year', '2nd Year', '3rd Year', '4th Year', '1st Sem', '2nd Sem', '3rd Sem', '4th Sem', '5th Sem', '6th Sem', '7th Sem', '8th Sem'].map(v => (
+                      <option key={v} value={v}>{v}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -251,6 +282,7 @@ export default function ScholarshipManagementPage() {
               <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-black">
                 <tr>
                   <th className="px-6 py-4">Student & Program</th>
+                  <th className="px-6 py-4">Sem/Type</th>
                   <th className="px-6 py-4">Benefit</th>
                   <th className="px-6 py-4">Amount</th>
                   <th className="px-6 py-4 text-right">Actions</th>
@@ -267,6 +299,10 @@ export default function ScholarshipManagementPage() {
                       <td className="px-6 py-4">
                         <div className="font-bold text-slate-700">{r.admission_students?.name}</div>
                         <div className="text-xs text-slate-500">{r.admission_students?.roll_no} • {r.admission_students?.admission_batches?.name}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-xs font-bold text-slate-600">{r.semester_or_year}</div>
+                        <div className="text-[10px] text-slate-400 uppercase tracking-wider">{r.scholarship_type}</div>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight ${r.is_waiver ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'}`}>

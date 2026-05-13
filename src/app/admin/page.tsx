@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import styles from './admin.module.css';
 import { createClient } from '@/lib/supabase/client';
@@ -17,6 +17,42 @@ import {
   Download, Upload
 } from 'lucide-react';
 
+const PROGRAM_GROUPS = [
+  { id: 'bbs',      label: 'BBS',       prefixes: ['BBS'],         color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
+  { id: 'bed',      label: 'B.Ed.',     prefixes: ['B.ED.', 'B.ED', 'BED'], color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0' },
+  { id: 'bhm',      label: 'BHM',       prefixes: ['BHM'],         color: '#f59e0b', bg: '#fffbeb', border: '#fde68a' },
+  { id: 'bim-bitm', label: 'BIM/BITM',  prefixes: ['BITM', 'BIM'], color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe' },
+  { id: 'mbs',      label: 'MBS',       prefixes: ['MBS'],         color: '#ec4899', bg: '#fdf2f8', border: '#fbcfe8' },
+];
+
+const YEAR_ORDER = [
+  '1st Year','2nd Year','3rd Year','4th Year',
+  '1st Semester','2nd Semester','3rd Semester','4th Semester',
+  '5th Semester','6th Semester','7th Semester','8th Semester',
+  '1st Sem','2nd Sem','3rd Sem','4th Sem',
+  '5th Sem','6th Sem','7th Sem','8th Sem',
+];
+
+const ETHNIC_CATEGORIES = ['Dalit','EDJ','Janajati','Madhesi','Other'];
+
+function matchesGroup(batchName: string, prefixes: string[]): boolean {
+  const upper = batchName.toUpperCase().trim();
+  return prefixes.some(p => {
+    const up = p.toUpperCase();
+    return upper.startsWith(up + ' ') || upper.startsWith(up + '-') || upper === up;
+  });
+}
+
+function extractYear(batchName: string): string {
+  for (const y of YEAR_ORDER) {
+    if (batchName.includes(y)) return y;
+  }
+  return 'Other';
+}
+
+function isGenderMale(g: string): boolean { return ['male','m'].includes(g.toLowerCase()); }
+function isGenderFemale(g: string): boolean { return ['female','f'].includes(g.toLowerCase()); }
+
 export default function AdminDashboard() {
   const { data: stats, isLoading } = useDashboardStats();
   const [isBackingUp, setIsBackingUp] = useState(false);
@@ -25,41 +61,6 @@ export default function AdminDashboard() {
   const [allStudentsData, setAllStudentsData] = useState<{ gender: string; ethnic_group: string; batchName: string }[]>([]);
   const [isProgramLoading, setIsProgramLoading] = useState(true);
   const router = useRouter();
-
-  const PROGRAM_GROUPS = [
-    { id: 'bbs',      label: 'BBS',       prefixes: ['BBS'],         color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
-    { id: 'bed',      label: 'B.Ed.',     prefixes: ['B.ED.', 'B.ED', 'BED'], color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0' },
-    { id: 'bhm',      label: 'BHM',       prefixes: ['BHM'],         color: '#f59e0b', bg: '#fffbeb', border: '#fde68a' },
-    { id: 'bim-bitm', label: 'BIM/BITM',  prefixes: ['BITM', 'BIM'], color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe' },
-    { id: 'mbs',      label: 'MBS',       prefixes: ['MBS'],         color: '#ec4899', bg: '#fdf2f8', border: '#fbcfe8' },
-  ];
-
-  const YEAR_ORDER = [
-    '1st Year','2nd Year','3rd Year','4th Year',
-    '1st Semester','2nd Semester','3rd Semester','4th Semester',
-    '5th Semester','6th Semester','7th Semester','8th Semester',
-    '1st Sem','2nd Sem','3rd Sem','4th Sem',
-    '5th Sem','6th Sem','7th Sem','8th Sem',
-  ];
-  const ETHNIC_CATEGORIES = ['Dalit','EDJ','Janajati','Madhesi','Other'];
-
-  function matchesGroup(batchName: string, prefixes: string[]): boolean {
-    const upper = batchName.toUpperCase().trim();
-    return prefixes.some(p => {
-      const up = p.toUpperCase();
-      return upper.startsWith(up + ' ') || upper.startsWith(up + '-') || upper === up;
-    });
-  }
-
-  function extractYear(batchName: string): string {
-    for (const y of YEAR_ORDER) {
-      if (batchName.includes(y)) return y;
-    }
-    return 'Other';
-  }
-
-  function isGenderMale(g: string): boolean { return ['male','m'].includes(g.toLowerCase()); }
-  function isGenderFemale(g: string): boolean { return ['female','f'].includes(g.toLowerCase()); }
 
   useEffect(() => {
     async function fetchStudentStats() {
@@ -85,6 +86,20 @@ export default function AdminDashboard() {
     fetchStudentStats();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Memoize program summaries to avoid re-calculating on every render
+  const programSummaries = useMemo(() => {
+    if (allStudentsData.length === 0) return [];
+    return PROGRAM_GROUPS.map(grp => {
+      const studentsInGroup = allStudentsData.filter(s => matchesGroup(s.batchName, grp.prefixes));
+      return {
+        ...grp,
+        total: studentsInGroup.length,
+        male: studentsInGroup.filter(s => isGenderMale(s.gender)).length,
+        female: studentsInGroup.filter(s => isGenderFemale(s.gender)).length,
+      };
+    });
+  }, [allStudentsData]);
 
   // Map RPC data to component variables
   const boardExams = stats?.board_exams || [];
@@ -223,76 +238,60 @@ export default function AdminDashboard() {
               <RefreshCw size={16} style={{ animation: 'spin 1s linear infinite' }} />
               <span style={{ fontSize: '0.85rem' }}>Loading program statistics...</span>
             </div>
-          ) : (() => {
-            // Compute per-program summaries
-            const summaries = PROGRAM_GROUPS.map(grp => {
-              const students = allStudentsData.filter(s => matchesGroup(s.batchName, grp.prefixes));
-              return {
-                ...grp,
-                total: students.length,
-                male: students.filter(s => isGenderMale(s.gender)).length,
-                female: students.filter(s => isGenderFemale(s.gender)).length,
-              };
-            });
-
-            return (
-              <>
-                {/* Program Cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '1rem', marginBottom: 0 }}>
-                  {summaries.map(prog => (
-                      <Link
-                        key={prog.id}
-                        href={`/admin/program-stats/${prog.id}`}
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <div
-                          style={{
-                            background: 'white',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '16px',
-                            padding: '1.25rem',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = `0 8px 16px ${prog.color}25`;
-                            e.currentTarget.style.borderColor = prog.color;
-                          }}
-                          onMouseLeave={e => {
-                            e.currentTarget.style.transform = 'none';
-                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.04)';
-                            e.currentTarget.style.borderColor = '#e2e8f0';
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                            <span style={{ fontWeight: 800, fontSize: '1rem', color: prog.color }}>{prog.label}</span>
-                            <span style={{ fontSize: '0.65rem', fontWeight: 700, background: prog.bg, color: prog.color, padding: '0.2rem 0.55rem', borderRadius: '20px', whiteSpace: 'nowrap' }}>
-                              View Report &rarr;
-                            </span>
-                          </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
-                            <span>Total</span>
-                            <strong style={{ color: '#0f172a' }}>{prog.total}</strong>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
-                            <span>Male</span>
-                            <strong style={{ color: '#3b82f6' }}>{prog.male}</strong>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
-                            <span>Female</span>
-                            <strong style={{ color: '#ec4899' }}>{prog.female}</strong>
-                          </div>
-                          </div>
-                        </div>
-                      </Link>
-                  ))}
-                </div>
-              </>
-            );
-          })()}
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '1rem', marginBottom: 0 }}>
+              {programSummaries.map(prog => (
+                  <Link
+                    key={prog.id}
+                    href={`/admin/program-stats/${prog.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <div
+                      style={{
+                        background: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '16px',
+                        padding: '1.25rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = `0 8px 16px ${prog.color}25`;
+                        e.currentTarget.style.borderColor = prog.color;
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.04)';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                        <span style={{ fontWeight: 800, fontSize: '1rem', color: prog.color }}>{prog.label}</span>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700, background: prog.bg, color: prog.color, padding: '0.2rem 0.55rem', borderRadius: '20px', whiteSpace: 'nowrap' }}>
+                          View Report &rarr;
+                        </span>
+                      </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
+                        <span>Total</span>
+                        <strong style={{ color: '#0f172a' }}>{prog.total}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
+                        <span>Male</span>
+                        <strong style={{ color: '#3b82f6' }}>{prog.male}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569' }}>
+                        <span>Female</span>
+                        <strong style={{ color: '#ec4899' }}>{prog.female}</strong>
+                      </div>
+                      </div>
+                    </div>
+                  </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

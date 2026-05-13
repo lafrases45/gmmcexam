@@ -57,6 +57,10 @@ const guessEthnicGroup = (fullName: string): string => {
   return "Other";
 };
 
+const PROGRAMS = ['BITM', 'BIM', 'BHM', 'MBS', 'BBS', 'B.Ed.']
+const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester']
+const SECTIONS = ['A', 'B']
+
 export default function StudentRegistry() {
   const { data: batches = [], isLoading } = useBatches()
   const queryClient = useQueryClient()
@@ -71,10 +75,6 @@ export default function StudentRegistry() {
   const [selectedYear, setSelectedYear] = useState('1st Year')
   const [selectedAcadYear, setSelectedAcadYear] = useState('2082')
   const [selectedSec, setSelectedSec] = useState('A')
-  
-  const PROGRAMS = ['BITM', 'BIM', 'BHM', 'MBS', 'BBS', 'B.Ed.']
-  const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester']
-  const SECTIONS = ['A', 'B']
 
   // B.Ed. helpers — defined before batchName which depends on isBEd
   const isBEd = selectedProg === 'B.Ed.' || selectedProg.toUpperCase().startsWith('B.ED')
@@ -476,7 +476,7 @@ export default function StudentRegistry() {
     })
     if (groups['Other']) sortedGroups['Other'] = groups['Other']
     return sortedGroups
-  }, [batches, PROGRAMS])
+  }, [batches]) // PROGRAMS is stable now
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '4rem' }}>
